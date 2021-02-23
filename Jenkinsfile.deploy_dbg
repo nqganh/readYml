@@ -13,7 +13,7 @@ pipeline {
 					echo 'Hello, Skull'
 					echo "${PROVIDER_MANIFEST}"
 					echo "${WORKSPACE}\$PROVIDER_MANIFEST"
-					//def PROVIDER_MANIFEST_DATA = readYaml file: "$WORKSPACE\raf_fullgression_F_225.yml"
+					def PROVIDER_MANIFEST_DATA = readFile file: "$WORKSPACE/$PROVIDER_MANIFEST"
 				}
 			}
 		}
