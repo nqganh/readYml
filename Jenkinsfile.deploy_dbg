@@ -7,8 +7,10 @@ pipeline {
                     }
             steps {
 				sctipt {
-					checkout scm
-					def PROVIDER_MANIFEST = "raf_fullgression_F_225"  + ".yml"
+					dir('subDir') {
+						checkout scm
+					}
+					def PROVIDER_MANIFEST = "ubDir/raf_fullgression_F_225"  + ".yml"
 					echo 'Hello, Skull'
 					echo '${PROVIDER_MANIFEST}'
 				}
