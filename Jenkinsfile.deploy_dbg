@@ -10,7 +10,7 @@ pipeline {
 					dir('subDir') {
 						checkout scm
 					}
-					def PROVIDER_MANIFEST = "ubDir/raf_fullgression_F_225"  + ".yml"
+					def PROVIDER_MANIFEST = "NQC"
 					echo 'Hello, Skull'
 					echo '${PROVIDER_MANIFEST}'
 				}
