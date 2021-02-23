@@ -1,6 +1,8 @@
 pipeline {
-    agent none 
-    stages {
+    node('skullken_node') {
+		
+		
+		stages {
         stage('Example Build') {
             options{ 
                         timeout(time: 4, unit: 'SECONDS')
@@ -20,4 +22,6 @@ pipeline {
             }
         }
     }
+	}
+    
 }
