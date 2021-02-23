@@ -12,8 +12,8 @@ pipeline {
 					def PROVIDER_MANIFEST = "raf_fullgression_F_225.yml"
 					echo 'Hello, Skull'
 					echo "${PROVIDER_MANIFEST}"
-					echo "${WORKSPACE}"
-					//def PROVIDER_MANIFEST_DATA = readYaml file: "$WORKSPACE/raf_fullgression_F_225.yml"
+					echo "${WORKSPACE}\$PROVIDER_MANIFEST"
+					//def PROVIDER_MANIFEST_DATA = readYaml file: "$WORKSPACE\raf_fullgression_F_225.yml"
 				}
 			}
 		}
