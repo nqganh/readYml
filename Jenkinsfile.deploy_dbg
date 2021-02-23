@@ -1,0 +1,484 @@
+@Library('as-jenkins-shared-lib')
+import com.rbbn.Artifactory
+import com.rbbn.RafAsManifest
+
+Artifactory artifactory    
+RafAsManifest rafAsManifest
+Boolean stackctl_apply_successful = false
+Boolean deployment_successful = false
+String docker_registry = "rcplc7artent.genband.com/iac-docker-dev-plano"
+def diskImage
+def ips
+
+pipeline {
+  
+    agent {
+        kubernetes {
+            cloud "ott-ocp1"
+            label "as-pre-raf-${JOB_BASE_NAME}-${BUILD_NUMBER}"
+            defaultContainer 'jnlp'
+            yaml """
+              apiVersion: v1
+              kind: Pod
+              spec:
+                restartPolicy: Always
+                imagePullSecrets:
+                - name: artifactory-ottawa
+                - name: artifactory-plano
+                containers:
+                - name: jnlp
+                  image: rcotc7artent.genband.com/dockerhub-docker-remote/jenkins/jnlp-slave:3.35-5-alpine
+                  resources:
+                    limits:
+                      cpu: 1
+                      memory: 1G
+                    requests:
+                      cpu: 0.5
+                      memory: 512M
+            """.stripIndent()
+        }
+    }
+  
+    parameters {
+        string(
+            defaultValue: '',
+            description: "branch name (latest will be taken) or Image name to use (vmdk)",
+            name: 'IMAGE_NAME')
+        gitParameter(
+          description: 'Tag of the container in the development registry to promote to the production registry.',
+          name: 'raf_tag',
+          quickFilterEnabled: true,
+          useRepository: '.*iac.git',
+          tagFilter: '*-b*', 
+          type: 'PT_TAG')
+        choice(
+            choices: [
+                'vmware_shared_3ip_8cpu_40ram',
+                'ott-vmware_shared_3ip_8cpu_40ram',
+                'ott-vmware_server_10ip_24cpu_128ram',
+                'ott-kvm_shared_3ip_8cpu_40ram',
+                'ott-kvm_server_10ip_24cpu_128ram'
+                ],
+            description: '',
+            name: 'RESOURCE_TAG1')
+        text(
+            name: 'MANIFEST',
+            defaultValue: '',
+            description: 'Manifests defining all objects to instantiate')
+        extendedChoice(
+            description: 'Pipeline names be triggered after a success deploy', 
+            multiSelectDelimiter: ',', 
+            name: 'test_pipeline_names', 
+            quoteValue: false, 
+            saveJSONParameterToFile: false, 
+            type: 'PT_CHECKBOX', 
+            value: '5-smoke-test, 5-FunctionalTest_AS14_Serial, 5-security-scan, 5-as-portal-ui-test, 5-CallpTest-Intra',
+            visibleItemCount: 5 )
+    }
+
+//    options {
+//        timestamps()
+//        lock(resource: null, label: "${params.RESOURCE_TAG1}", variable: 'SERVER', quantity: 1)
+//    }
+
+    environment {
+        ARTIFACTORY_CREDENTIAL =                'Artifactory'
+        ARTIFACTORY_URL_PLANO=                  "rcplc7artent.genband.com/artifactory"
+        ARTIFACTORY_RAF_SCRIPTS_REPO=           'iac-generic-prod-plano/raf/automation_scripts/as'
+        ARTIFACTORY_AS_CACHE=                   'as-generic-prod-virtual'
+
+        IAC_REPO_DIR=                           "/iac_main/iac"
+        STACKCTL=                               "${IAC_REPO_DIR}/stackCtl/stackctl"
+        AS_LICENSE_CREDENTIAL_ID=               '21.0_20.0_19.0_Core_Lab_License_Key_Encryption_ExtAppSeq'
+        MAS_LICENSE_CREDENTIAL_ID=              'MAS_19.0_LabKeyEncryption.txt'
+        STACKCTL_OUTPUT_FILE=                   'stackctl_output.txt'
+    }
+
+    stages {
+        stage('Pre-deploy') {
+            steps {
+                script {
+                    //git checkouts to allow the tag selection parameter
+                    checkout scm // lab-resources.git
+                    checkout([$class: 'GitSCM', 
+                        branches: [[name: "${params.raf_tag}"]], 
+                        extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'raf']], 
+                        userRemoteConfigs: [[credentialsId: 'f9678791-baea-418f-a23f-a4d6a55487f6', url: 'https://bitbucket.rbbn.com/scm/iac/iac.git']]])
+
+                    // Retrieve branch name from RAF tag
+                    BRANCH_NAME = (params.raf_tag =~ /[0-9]{2}\.[0-9]{2}-(.+)-b[0-9]+/)[0][1]
+
+                    // Convert test pipelines to list
+
+                    // Get server config from Lockable Resource definition
+					def SERVER = params.RESOURCE_TAG1
+                    def server_config = readJSON text: env.SERVER
+                    SERVER_NETWORKS = server_config.networks
+
+                    // Get k8s/OpenShift cloud in the same lab as the server to run the Jenkins agent
+                    CLOUD_NAME = ""
+                    if (server_config.region == "plano") {
+                        CLOUD_NAME = "rco-ocp1"
+                        LOCAL_ARTIFACTORY_SERVER = Artifactory.Servers.PLANO
+                    } else if (server_config.region == "ottawa") {
+                        CLOUD_NAME = "ott-ocp1"
+                        LOCAL_ARTIFACTORY_SERVER = Artifactory.Servers.OTTAWA
+                    } else {
+                        error "This region (${server_config.region}) is not supported by pipeline"
+                    }
+
+                    // Load the Manifest defining the providerAccess and Network objects for this server
+                    def PROVIDER_MANIFEST = "build/" + server_config.region + "/manifests/" + server_config.name.replaceAll("-","_").replaceAll(" ","_").toLowerCase()  + ".yml"
+                    
+                    //Intantiate helper class
+                    def AS_MANIFEST_CONTENT = readYaml text: params.MANIFEST
+                    def PROVIDER_MANIFEST_DATA = readYaml file: "$WORKSPACE/$PROVIDER_MANIFEST"
+                    rafAsManifest = new RafAsManifest(this, AS_MANIFEST_CONTENT, PROVIDER_MANIFEST_DATA)
+
+                    currentBuild.description = '<a href="https://bitbucket.rbbn.com/projects/ASRV/repos/lab-resources/browse/'+PROVIDER_MANIFEST+'">'+rafAsManifest.PROVIDER_TYPE +' Provider: ' + rafAsManifest.GetProviderIp()+'</a>'
+                    currentBuild.displayName = "Deploy on ${rafAsManifest.PROVIDER_TYPE.toUpperCase()} - ${rafAsManifest.AS_MANIFEST.spec.vnfs[0].rgs[0].vnfcs.size()} VM(s) #${BUILD_NUMBER}"
+
+                    AUTOMATION_SCRIPT_FILE_NAME = "as-${params.raf_tag}-${rafAsManifest.PROVIDER_TYPE}_automation_scripts.tar.gz"
+
+                    // Add credentials for wget of automation scripts
+                    withCredentials([usernameColonPassword(credentialsId: ARTIFACTORY_CREDENTIAL, variable: 'ARTIFACTORY_USER_PASS')]){
+                        AUTOMATION_SCRITPS_URL_WITH_AUTH = "https://${ARTIFACTORY_USER_PASS}@${ARTIFACTORY_URL_PLANO}/${ARTIFACTORY_RAF_SCRIPTS_REPO}/${BRANCH_NAME}/${params.raf_tag}/${AUTOMATION_SCRIPT_FILE_NAME}"
+                    }
+
+                    // Verify that the Automation Script package exists for this server type
+                    sh label: 'check automation scripts exists', returnStdout: true, script: """
+                        wget --spider ${AUTOMATION_SCRITPS_URL_WITH_AUTH}
+                    """.stripIndent()
+                }
+            }
+        }
+        stage('Deploy RAF Container'){
+            agent {
+                kubernetes {
+                    cloud "${CLOUD_NAME}"
+                    label "as-raf-${JOB_BASE_NAME}-${BUILD_NUMBER}"
+                    defaultContainer 'raf'
+                    yaml """
+                      apiVersion: v1
+                      kind: Pod
+                      spec:
+                        restartPolicy: Always
+                        imagePullSecrets:
+                        - name: artifactory-ottawa
+                        - name: artifactory-plano
+                        containers:
+                        - name: jnlp
+                          image: rcotc7artent.genband.com/dockerhub-docker-remote/jenkins/jnlp-slave:3.35-5-alpine
+                          resources:
+                            limits:
+                              cpu: 1
+                              memory: 1G
+                            requests:
+                              cpu: 0.5
+                              memory: 512M
+                        - name: raf
+                          image: ${docker_registry}/${BRANCH_NAME}/raf:${params.raf_tag}
+                          imagePullPolicy: Always
+                          tty: true
+                          env:
+                          - name: STACK_API_ACCESS_IP
+                            value: localhost
+                          - name: STACK_API_ACCESS_PORT
+                            value: 80
+                          volumeMounts:
+                          - name: raf-resources
+                            mountPath: /resources
+                          - name: raf-objects
+                            mountPath: /objects
+                          securityContext:
+                            allowPrivilegeEscalation: false
+                            runAsUser: 0
+                          resources:
+                            limits:
+                              cpu: 1
+                              memory: 1G
+                            requests:
+                              cpu: 0.5
+                              memory: 512M
+                        - name: curl-jq
+                          image: rcotc7artent.genband.com/dockerhub-docker-remote/alpine:3.12.1
+                          command: ['cat']
+                          tty: true
+                          imagePullPolicy: IfNotPresent 
+                          volumeMounts:
+                          - name: raf-resources
+                            mountPath: /resources
+                          resources:
+                            limits:
+                              cpu: 0.5
+                              memory: 256M
+                            requests:
+                              cpu: 0.25
+                              memory: 128M
+                        initContainers:
+                        - name: get-scripts-raf
+                          image: rcotc7artent.genband.com/dockerhub-docker-remote/alpine:3.12.1
+                          command: [ "/bin/sh", "-c", "--" ]
+                          args: [ "mkdir -p /resources/scripts && cd /resources/scripts && wget ${AUTOMATION_SCRITPS_URL_WITH_AUTH}"]
+                          resources:
+                            limits:
+                              cpu: 0.5
+                              memory: 256M
+                            requests:
+                              cpu: 0.25
+                              memory: 128M
+                          volumeMounts:
+                          - name: raf-resources
+                            mountPath: /resources
+                        volumes:
+                        - emptyDir: {}
+                          name: raf-resources
+                        - emptyDir: {}
+                          name: raf-objects
+                    """.stripIndent()
+                }
+            }
+            stages{
+                stage('Get Disk Image') {
+                    steps {
+                        container('curl-jq') {
+                            sh "apk add curl jq bash"
+
+                            // Find Disk Image Artifact
+                            withCredentials([usernameColonPassword(credentialsId: ARTIFACTORY_CREDENTIAL, variable: 'ARTIFACTORY_USER_PASS')]){
+                                script {
+                                    artifactory = new Artifactory(this, ARTIFACTORY_USER_PASS, LOCAL_ARTIFACTORY_SERVER, ARTIFACTORY_AS_CACHE)
+                                    diskImage = artifactory.FindArtifactsByName(params.IMAGE_NAME+"*").find { artifact ->
+                                        artifact.FileName.endsWith(".${rafAsManifest.IMAGE_TYPE}")
+                                    }
+                                }
+                            }
+
+                            script {
+                                currentBuild.description += '<br><a href="https://bitbucket.rbbn.com/projects/IAC/repos/iac/commits?until='+params.raf_tag+'">'+params.raf_tag+'</a>'
+                                currentBuild.description += '<br><a href="'+ diskImage.GetArtifactoryUiUrl() +'">'+diskImage.FileName+'</a><br>'
+                            }
+                        }
+                        container('raf') {
+                            script {
+                                diskImage.Download("/resources/images/")
+                            }
+                        }
+                    }
+                }
+                stage('Update Manifest') {
+                    steps {
+                        container('raf') {
+                            withCredentials([file(credentialsId: env.AS_LICENSE_CREDENTIAL_ID,  variable: 'AS_LICENSE_SECRET_PATH')]) {
+                                withCredentials([file(credentialsId: env.MAS_LICENSE_CREDENTIAL_ID,  variable: 'MAS_LICENSE_SECRET_PATH')]) {
+                                    script {
+                                        def asLicenseFile = readFile file: AS_LICENSE_SECRET_PATH, encoding: "Base64" 
+                                        def masLicenseFile = readFile file: MAS_LICENSE_SECRET_PATH, encoding: "Base64" 
+                                        ips = rafAsManifest.UpdateManifest(
+                                                "jenkins-b${env.BUILD_NUMBER}",
+                                                SERVER_NETWORKS,
+                                                diskImage.FileName, 
+                                                asLicenseFile, 
+                                                masLicenseFile)
+
+                                        int cnt = 0
+                                        for( cnt = 0; cnt < rafAsManifest.PROVIDER_MANIFEST_DATA.size(); cnt++) {
+                                            writeYaml file: "temp/${cnt}_manifest.yml", data: rafAsManifest.PROVIDER_MANIFEST_DATA[cnt]
+                                        }
+                                        writeYaml file: "temp/${cnt}_manifest.yml", data: rafAsManifest.AS_MANIFEST
+
+                                        sh label: 'Write updated manifest in objects folder', script: """
+                                            for each in temp/*.yml; do echo '---'; cat \$each; done > merged_manifest.yml
+                                            cp *.yml /objects
+                                        """.stripIndent()
+
+                                        archiveArtifacts artifacts: "temp/*.yml", allowEmptyArchive: true
+                                        archiveArtifacts artifacts: "merged_manifest.yml", allowEmptyArchive: true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                stage('Check for IP conflict') {
+                    steps {
+                        container('curl-jq') {
+                            script {
+                                def message = 'Check IP availability on host ' + rafAsManifest.GetProviderIp() + ' ['
+                                ips.each{ message += " $it," }
+                                message += "]"
+                                echo message
+
+                                def pingSteps = [:]
+                                ips.each { ip -> 
+                                    pingSteps["${ip}"] = {
+                                        sh label: "Check if IP ($ip) is already used", script: """
+                                            cd ${WORKSPACE}/build/scripts && ./check_if_ip_addr_free.sh ${ip} 
+                                        """.stripIndent()
+                                    }
+                                }
+                                parallel pingSteps 
+                            }
+                        }
+                    }
+                }
+                stage('Validate Manifest') {
+                    steps {
+                        container('raf') {
+                            sh label: 'stackctl validate manifest', script: """
+                                ${STACKCTL} validate -f /objects/merged_manifest.yml | tee ${STACKCTL_OUTPUT_FILE} | awk -F ':' '\$1=="success" {print \$2}' | grep True  || cat ${STACKCTL_OUTPUT_FILE}
+                            """.stripIndent() 
+                        }
+                    }
+                }
+                stage('Deploy') {
+                    options{ 
+                        timeout(time: 4, unit: 'HOURS')
+                    }
+                    steps {
+                        container('raf') {
+                            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                                script {
+                                    sh label: 'stackctl create provider and networks', script: """
+                                        ${STACKCTL} get objects
+    
+                                        ${STACKCTL} apply -f /objects/merged_manifest.yml | tee ${STACKCTL_OUTPUT_FILE} | awk -F ':' '\$1=="success" {print \$2}' | grep True
+    
+                                        ${STACKCTL} get objects
+                                    """.stripIndent()
+
+                                    stackctl_apply_successful = true
+                                }
+                            }
+                        }
+                    }
+                    post {
+                        failure {
+                            sh label: 'print stackctl output', script: """
+                                ${STACKCTL} get objects
+                                cat ${STACKCTL_OUTPUT_FILE}
+                            """.stripIndent()
+                        }
+                        always {
+                            sh "mkdir -p ${WORKSPACE}/artifacts"
+                            sh "cp ${IAC_REPO_DIR}/stackApiServer.log ${WORKSPACE}/artifacts/"
+
+                            archiveArtifacts allowEmptyArchive: true, artifacts: 'artifacts/**/*.log'
+                            archiveArtifacts allowEmptyArchive: true, artifacts: 'artifacts/**/*.yml'
+                            archiveArtifacts allowEmptyArchive: true, artifacts: 'artifacts/**/*.json'
+                        }
+                    }
+                }
+                stage('Wait') {
+                    options{ 
+                        timeout(time: 4, unit: 'HOURS')
+                    }
+                    when { expression { stackctl_apply_successful } }
+                    steps {
+                        container('curl-jq') {
+                            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                                script {
+                                    rafAsManifest.objectNames.each{ 
+                                        sh label: "Wait for '${it}' object", script: """
+                                            until curl -sf http://localhost/api/v1/objects | jq '.message | .[] | .${it} | select(.status!=null) | .status' | grep "Created\\|Fail"; do
+                                              sleep 120
+                                              curl -sf http://localhost/api/v1/objects/${it}/logs
+                                            done
+                                            curl -sf http://localhost/api/v1/objects | jq '.message | .[] | .${it} | select(.status!=null) | .status' | grep Created
+                                        """.stripIndent()
+                                    }
+                                }
+                            }
+                        }
+                        container('raf') {
+                            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                                script {
+                                    rafAsManifest.objectNames.each{ 
+                                        sh label: 'stackctl describe objects', script: """
+                                            ${STACKCTL} describe objects -n ${it}
+                                        """.stripIndent()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    post {
+                        always {
+                            script {
+                                sh "cp -R /objects/ ${WORKSPACE}/artifacts/"
+                                sh "cp ${IAC_REPO_DIR}/stackApiServer.log ${WORKSPACE}/artifacts/"
+
+                                def deployment_json = readJSON file: "${WORKSPACE}/artifacts/objects/${rafAsManifest.AS_MANIFEST['metadata']['name']}/status.json"
+                                deployment_successful = ("Created" == deployment_json["${rafAsManifest.AS_MANIFEST['metadata']['name']}"]['AsVnf-0']['status'])
+                                echo "deployment_successful " + deployment_successful.toString()
+
+                                archiveArtifacts allowEmptyArchive: true, artifacts: 'artifacts/**/*.log'
+                                archiveArtifacts allowEmptyArchive: true, artifacts: 'artifacts/**/*.yml'
+                                archiveArtifacts allowEmptyArchive: true, artifacts: 'artifacts/**/extravars'
+                                archiveArtifacts allowEmptyArchive: true, artifacts: 'artifacts/**/*.tfvars'
+                                archiveArtifacts allowEmptyArchive: true, artifacts: 'artifacts/**/*.json'
+                            }
+                        }
+                    }
+                }
+                stage('Run Test') {
+                    when { expression { deployment_successful } }
+                    steps {
+                        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                            script {
+                                def testParams = rafAsManifest.GetIpParamFromManifest().collect {ipName, ipValue ->
+                                    string(name: ipName, value: ipValue)
+                                }
+                                testParams << string(name:"LOAD_VERSION", value: params.IMAGE_NAME)
+
+                                params.test_pipeline_names.split(',').each{ testJobName ->
+                                    def testJob = build propagate: false, job: "../${testJobName}", parameters: testParams 
+                                    if (testJob.getResult() == 'FAILURE' )
+                                        currentBuild.result = 'UNSTABLE'
+                                }
+                            }
+                        }
+                    }
+                }
+                stage('Destroy') {
+                    options{ 
+                        timeout(time: 30, unit: 'MINUTES')
+                    }
+                    steps {
+                        container('raf') {
+                            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                                script {
+                                    rafAsManifest.objectNames.reverse().each{ 
+                                        sh label: "Delete the '${it}' object", script: """
+                                            ${STACKCTL} delete objects -n ${it} | tee ${STACKCTL_OUTPUT_FILE} | awk -F ':' '\$1=="success" {print \$2}' | grep True || cat ${STACKCTL_OUTPUT_FILE}
+                                        """.stripIndent()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    post {
+                        always {
+                            sh "cp -R /objects/ ${WORKSPACE}/artifacts/"
+                            sh "cp ${IAC_REPO_DIR}/stackApiServer.log ${WORKSPACE}/artifacts/"
+
+                            archiveArtifacts allowEmptyArchive: true, artifacts: 'artifacts/**/*.log'
+                            archiveArtifacts allowEmptyArchive: true, artifacts: 'artifacts/**/*.yml'
+                            archiveArtifacts allowEmptyArchive: true, artifacts: 'artifacts/**/*.tfvars'
+                            archiveArtifacts allowEmptyArchive: true, artifacts: 'artifacts/**/*.json'
+                        }
+                    }
+                }
+            }
+        }
+    }
+    post {
+        always {
+            script {
+                if ( ! deployment_successful  ) {
+                    error("Deployment failed.")
+                }
+            }
+        }
+    }
+}
