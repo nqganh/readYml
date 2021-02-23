@@ -1,7 +1,7 @@
 pipeline {
     agent {
 		label 'skullken_node'
-	
+	}
 	stages {
 		stage('Example Build') {
 			options{ 
@@ -12,7 +12,7 @@ pipeline {
 					def PROVIDER_MANIFEST = "raf_fullgression_F_225.yml"
 					echo 'Hello, Skull'
 					echo "${PROVIDER_MANIFEST}"
-					def PROVIDER_MANIFEST_DATA = readYaml file: "$WORKSPACE/raf_fullgression_F_225.yml"
+					//def PROVIDER_MANIFEST_DATA = readYaml file: "$WORKSPACE/raf_fullgression_F_225.yml"
 				}
 			}
 		}
@@ -21,6 +21,5 @@ pipeline {
 				echo 'Hello, JDK'
 			}
 		}
-	}
-	}
+	}   
 }
