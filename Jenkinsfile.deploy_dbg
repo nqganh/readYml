@@ -1,27 +1,25 @@
 pipeline {
     agent {
 		label 'skullken_node'
-		}
-		stages {
-			stage('Example Build') {
-				options{ 
-							timeout(time: 4, unit: 'SECONDS')
-						}
-				steps {
-					script {
-						def PROVIDER_MANIFEST = "raf_fullgression_F_225.yml"
-						echo 'Hello, Skull'
-						echo ${PROVIDER_MANIFEST}
-						def PROVIDER_MANIFEST_DATA = readYaml file: "$WORKSPACE/$PROVIDER_MANIFEST"
-					}
-				}
-			}
-			stage('Example Test') {
-				steps {
-					echo 'Hello, JDK'
-				}
-			}
-		}
 	}
-    
+	stages {
+		stage('Example Build') {
+			options{ 
+						timeout(time: 4, unit: 'SECONDS')
+					}
+			steps {
+				script {
+					def PROVIDER_MANIFEST = "raf_fullgression_F_225.yml"
+					echo 'Hello, Skull'
+					echo ${PROVIDER_MANIFEST}
+					def PROVIDER_MANIFEST_DATA = readYaml file: "$WORKSPACE/$PROVIDER_MANIFEST"
+				}
+			}
+		}
+		stage('Example Test') {
+			steps {
+				echo 'Hello, JDK'
+			}
+		}
+	}   
 }
