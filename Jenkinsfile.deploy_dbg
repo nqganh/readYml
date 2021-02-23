@@ -6,7 +6,8 @@ pipeline {
                         timeout(time: 4, unit: 'SECONDS')
                     }
             steps {
-				sctipt {
+				script {
+					def PROVIDER_MANIFEST = "raf_fullgression_F_225.yml"
 					echo 'Hello, Skull'
 					echo '${PROVIDER_MANIFEST}'
 				}
