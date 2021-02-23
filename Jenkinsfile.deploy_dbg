@@ -7,10 +7,6 @@ pipeline {
                     }
             steps {
 				sctipt {
-					dir('subDir') {
-						checkout scm
-					}
-					def PROVIDER_MANIFEST = "NQC"
 					echo 'Hello, Skull'
 					echo '${PROVIDER_MANIFEST}'
 				}
