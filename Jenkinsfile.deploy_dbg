@@ -1,3 +1,6 @@
+import org.yaml.snakeyaml.Yaml
+import org.yaml.snakeyaml.DumperOptions
+
 pipeline {
     agent {
 		label 'skullken_node'
@@ -12,7 +15,7 @@ pipeline {
 					def PROVIDER_MANIFEST = "raf_fullgression_F_225.yml"
 					echo 'Hello, Skull'
 					echo "${PROVIDER_MANIFEST}"
-					echo readYaml file: "$WORKSPACE"+"\raf_fullgression_F_225.yml"
+					echo readYaml file: "$WORKSPACE"\raf_fullgression_F_225.yml"
 					echo PROVIDER_MANIFEST_DATA.ear_file.deploy.toString()
 				}
 			}
