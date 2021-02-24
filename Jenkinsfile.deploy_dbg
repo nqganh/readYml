@@ -25,10 +25,8 @@ pipeline {
 							result[vnfc.name] = vnfc
 							result
 						}
-					 
 						def serviceAddresses = AS_MANIFEST.spec.vnfs[0].appConfig.serviceAddresses
 						//serviceAddresses.each{
-					 
 						def netDesc = ""
 						def networkElements = AS_MANIFEST.spec.vnfs[0].appConfig.networkElements
 						networkElements.each{ ne, info ->
