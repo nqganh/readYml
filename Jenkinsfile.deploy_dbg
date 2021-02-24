@@ -16,7 +16,48 @@ pipeline {
 					echo 'Hello, Skull'
 					echo "${PROVIDER_MANIFEST}"
 					def PROVIDER_MANIFEST_DATA = readYaml file: "$WORKSPACE/$PROVIDER_MANIFEST"
-					echo PROVIDER_MANIFEST_DATA.toString()
+					//echo PROVIDER_MANIFEST_DATA.toString()
+					if(PROVIDER_MANIFEST_DATA['kind'] == 'GenericAsVnf') {
+					 
+						// Retreive the VNFC list from the manifest
+						def vnfcs = AS_MANIFEST['spec']['vnfs'][0]['rgs'][0]['vnfcs']
+						// Create a Map of VNFC by name
+						def vnfcsByName = vnfcs.inject([:]){ result, vnfc ->
+							result[vnfc.name] = vnfc
+							result
+						}
+					 
+						def serviceAddresses = AS_MANIFEST.spec.vnfs[0].appConfig.serviceAddresses
+						//serviceAddresses.each{
+					 
+						def netDesc = ""
+						def networkElements = AS_MANIFEST.spec.vnfs[0].appConfig.networkElements
+						networkElements.each{ ne, info ->
+							info.managers.eachWithIndex{ manager, mgrIdx ->
+								def mgrIdxStr = ""
+								if(info.managers.size() > 1) {
+									mgrIdxStr = "${mgrIdx+1}"
+								}
+								if(manager.containsKey("internalOamAddress")){
+									netDesc +="RAF_${ne.toUpperCase()}${mgrIdxStr}_IP: $manager.internalOamAddress ($ne internalOamAddress)\n"
+								}
+								if(manager.containsKey("serviceAddressName")){
+									def serviceAddress = serviceAddresses.find{ it.name == manager.serviceAddressName }
+									netDesc +="RAF_${ne.toUpperCase()}${mgrIdxStr}_IP: $serviceAddress.ip ($ne ${mgrIdxStr} serviceAddressName, $serviceAddress.name)\n"
+								}
+								manager.instances.eachWithIndex{ instance, istIdx ->
+									vnfcsByName[instance.server].networkInfo.networkInterfaces.each{ nic ->
+										def istIdxStr = ""
+										if(info.managers.any{ it.instances.size() > 1 }) {
+											istIdxStr = "${istIdx}_"
+										}
+										netDesc +="RAF_${ne.toUpperCase()}${mgrIdxStr}_${istIdxStr}IP: $nic.ipv4Address ($nic.subnetName on $instance.server)\n"
+									}
+								}
+							}
+						}
+						println(netDesc)
+					}
 				}
 			}
 		}
