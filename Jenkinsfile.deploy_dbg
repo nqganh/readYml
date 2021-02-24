@@ -20,6 +20,7 @@ pipeline {
 					if(AS_MANIFEST['kind'] == 'GenericAsVnf') {
 						// Retreive the VNFC list from the manifest
 						def vnfcs = AS_MANIFEST['spec']['vnfs'][0]['rgs'][0]['vnfcs']
+						println(vnfcs)
 						// Create a Map of VNFC by name
 						def vnfcsByName = vnfcs.inject([:]){ result, vnfc ->
 							result[vnfc.name] = vnfc
@@ -43,7 +44,7 @@ pipeline {
 									def serviceAddress = serviceAddresses.find{ it.name == manager.serviceAddressName }
 									netDesc +="RAF_${ne.toUpperCase()}${mgrIdxStr}_IP: $serviceAddress.ip ($ne ${mgrIdxStr} serviceAddressName, $serviceAddress.name)\n"
 								}
-								//manager.instances.eachWithIndex{ instance, istIdx ->
+								//nager.instances.eachWithIndex{ instance, istIdx ->
 								//	vnfcsByName[instance.server].networkInfo.networkInterfaces.each{ nic ->
 								//		def istIdxStr = ""
 								//		if(info.managers.any{ it.instances.size() > 1 }) {
