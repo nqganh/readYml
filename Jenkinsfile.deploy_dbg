@@ -42,15 +42,15 @@ pipeline {
 									def serviceAddress = serviceAddresses.find{ it.name == manager.serviceAddressName }
 									netDesc +="RAF_${ne.toUpperCase()}${mgrIdxStr}_IP: $serviceAddress.ip ($ne ${mgrIdxStr} serviceAddressName, $serviceAddress.name)\n"
 								}
-								manager.instances.eachWithIndex{ instance, istIdx ->
-									vnfcsByName[instance.server].networkInfo.networkInterfaces.each{ nic ->
-										def istIdxStr = ""
-										if(info.managers.any{ it.instances.size() > 1 }) {
-											istIdxStr = "${istIdx}_"
-										}
-										netDesc +="RAF_${ne.toUpperCase()}${mgrIdxStr}_${istIdxStr}IP: $nic.ipv4Address ($nic.subnetName on $instance.server)\n"
-									}
-								}
+								//manager.instances.eachWithIndex{ instance, istIdx ->
+								//	vnfcsByName[instance.server].networkInfo.networkInterfaces.each{ nic ->
+								//		def istIdxStr = ""
+								//		if(info.managers.any{ it.instances.size() > 1 }) {
+								//			istIdxStr = "${istIdx}_"
+								//		}
+								//		netDesc +="RAF_${ne.toUpperCase()}${mgrIdxStr}_${istIdxStr}IP: $nic.ipv4Address ($nic.subnetName on $instance.server)\n"
+								//	}
+								//}
 							}
 						}
 						println(netDesc)
