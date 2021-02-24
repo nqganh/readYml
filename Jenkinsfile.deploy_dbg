@@ -19,9 +19,9 @@ pipeline {
 					//echo AS_MANIFEST.toString()
 					if(AS_MANIFEST['kind'] == 'GenericAsVnf') {
 						// Retreive the VNFC list from the manifest
-						def vnfcs = AS_MANIFEST['spec']['vnfs'][0]['rgs'][0]['vnfcs']
+						def vnfcs0 = AS_MANIFEST['spec']['vnfs'][0]['rgs'][0]['vnfcs']
 						def vnfcs1 = AS_MANIFEST['spec']['vnfs'][0]['rgs'][1]['vnfcs']
-						def abc = (vnfcs << vnfcs1).flatten()
+						def vnfcs = (vnfcs0 << vnfcs1).flatten()
 						println(vnfcs)
 						// Create a Map of VNFC by name
 						def vnfcsByName = vnfcs.inject([:]){ result, vnfc ->
