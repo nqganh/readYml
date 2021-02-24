@@ -13,9 +13,10 @@ pipeline {
 					echo 'Hello, Skull'
 					echo "${PROVIDER_MANIFEST}"
 					echo "${WORKSPACE}\$PROVIDER_MANIFEST"
-					def PROVIDER_MANIFEST_DATA = readYaml {file: "$WORKSPACE/$PROVIDER_MANIFEST"}
-					echo PROVIDER_MANIFEST_DATA.ear_file.deploy.toString()
+					
 				}
+				def PROVIDER_MANIFEST_DATA = readYaml file: "$WORKSPACE/$PROVIDER_MANIFEST"
+				echo PROVIDER_MANIFEST_DATA.ear_file.deploy.toString()
 			}
 		}
 		stage('Example Test') {
