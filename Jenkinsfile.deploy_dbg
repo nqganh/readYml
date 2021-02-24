@@ -34,6 +34,7 @@ pipeline {
 								def mgrIdxStr = ""
 								if(info.managers.size() > 1) {
 									mgrIdxStr = "${mgrIdx+1}"
+									println(mgrIdxStr)
 								}
 								if(manager.containsKey("internalOamAddress")){
 									netDesc +="RAF_${ne.toUpperCase()}${mgrIdxStr}_IP: $manager.internalOamAddress ($ne internalOamAddress)\n"
