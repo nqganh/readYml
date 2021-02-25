@@ -16,7 +16,7 @@ pipeline {
 					def PROVIDER_MANIFEST = "raf_fullgression_F_225.yml"
 					echo 'Hello, Skull'
 					currentBuild.description = '<a href="https://bitbucket.rbbn.com/projects/ASRV/repos/lab-resources/browse/'+PROVIDER_MANIFEST+'">'+'SKullken'+'</a>'
-                    currentBuild.displayName = "Read Yaml file"
+                    currentBuild.displayName = "Read Yaml file #${BUILD_NUMBER}"
 					def AS_MANIFEST = readYaml file: "$WORKSPACE/$PROVIDER_MANIFEST"
 					//echo AS_MANIFEST.toString()
 					if(AS_MANIFEST['kind'] == 'GenericAsVnf') {
