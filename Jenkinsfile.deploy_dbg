@@ -24,6 +24,11 @@ pipeline {
 					def info_name = (image_name =~ /[0-9]{2}\.[0-9]{2}-(.+)-b[0-9]+/)[0][1] 
 
 					println(info_name)
+					
+					def image_name1 = 'AS-15.0.0.0.1616.vmdk'
+					def info_name1 = (image_name1 =~ /AS-15\.[0-9]{1}\.[0-9]{1}\.[0-9]{1}\.[0-9]{1}\.([0-9]{4})\.(.+)/)[0][1] 
+
+					println(info_name1)
 					//echo AS_MANIFEST.toString()
 					if(AS_MANIFEST['kind'] == 'GenericAsVnf') {
 						// Retreive the VNFC list from the manifest
