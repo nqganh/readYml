@@ -17,6 +17,10 @@ pipeline {
 					echo 'Hello, Skull'
 					currentBuild.description = '<a href="https://bitbucket.rbbn.com/projects/ASRV/repos/lab-resources/browse/'+'">'+'SKullken'+'</a>'
                     currentBuild.displayName = "Read Yaml file #${BUILD_NUMBER}"
+					def image_name = AS_MANIFEST['spec']['vnfs'][0]['rgs'][0]['image']
+					def info_name = (image_name =~ /(\w+)-([0-9]{2}).([0-9]{1}).([0-9]{1}).([0-9]{4}).(\w+))[0][1] 
+					//AS-15.0.0.0.1526.vmdk
+					println(info_name)
 					def AS_MANIFEST = readYaml file: "$WORKSPACE/$PROVIDER_MANIFEST"
 					//echo AS_MANIFEST.toString()
 					if(AS_MANIFEST['kind'] == 'GenericAsVnf') {
