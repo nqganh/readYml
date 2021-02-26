@@ -26,7 +26,7 @@ pipeline {
 					println(info_name)
 					
 					def image_name1 = 'AS-15.0.0.0.1616.vmdk'
-					def info_name1 = (image_name1 =~ /AS-15\.[0-9]{1}\.[0-9]{1}\.[0-9]{1}\.[0-9]{1}\.([0-9]{4})\.(.+)/)[0][1] 
+					def info_name1 = (image_name1 =~ /AS-15\.[0-9]{1}\.[0-9]{1}\.[0-9]{1}\.[0-9]{1}\.([0-9]{4})\.(.+)/) 
 
 					println(info_name1)
 					//echo AS_MANIFEST.toString()
