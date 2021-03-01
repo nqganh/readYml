@@ -21,7 +21,7 @@ pipeline {
 				
 					def PROVIDER_MANIFEST = params.MANIFEST_NAME
 					echo 'Hello, Skull'
-					currentBuild.description = "<a href=https://bitbucket.rbbn.com/projects/ASRV/repos/lab-resources/browse/"+">"+'SKullken'+'</a>'
+					currentBuild.description = "<a href=https://bitbucket.rbbn.com/projects/ASRV/repos/lab-resources/browse"+">"+'SKullken'+'</a>'
                     currentBuild.displayName = "Read Yaml file #${BUILD_NUMBER}"
 
 					def AS_MANIFEST = readYaml file: "$WORKSPACE/$PROVIDER_MANIFEST"
