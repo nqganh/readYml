@@ -5,6 +5,12 @@ pipeline {
     agent {
 		label 'skullken_node'
 	}
+	parameters {
+        string(
+            defaultValue: 'raf_fullgression_F_225.yml',
+            description: "Manifest file name",
+            name: 'MANIFEST_NAME')
+    }
 	stages {
 		stage('Example Build') {
 			options{ 
@@ -13,7 +19,7 @@ pipeline {
 			steps {
 				script {
 				
-					def PROVIDER_MANIFEST = "raf_fullgression_F_225.yml"
+					def PROVIDER_MANIFEST = params.MANIFEST_NAME
 					echo 'Hello, Skull'
 					currentBuild.description = "<a href=https://bitbucket.rbbn.com/projects/ASRV/repos/lab-resources/browse/"+">"+'SKullken'+'</a>'
                     currentBuild.displayName = "Read Yaml file #${BUILD_NUMBER}"
