@@ -63,7 +63,7 @@ pipeline {
 								}
 								if(manager.containsKey("serviceAddressName")){
 									def serviceAddress = serviceAddresses.find{ it.name == manager.serviceAddressName }
-									netDesc +="RAF_${ne.toUpperCase()}${mgrIdxStr}_IP: $serviceAddress.ip ($ne ${mgrIdxStr} serviceAddressName, $serviceAddress.name)\n"
+									netDesc +="RAF_${ne.toUpperCase()}${mgrIdxStr}_IP: $serviceAddress.ipv4 ($ne ${mgrIdxStr} serviceAddressName, $serviceAddress.name)\n"
 								}
 								manager.instances.eachWithIndex{ instance, istIdx ->
 									vnfcsByName[instance.server].networkInfo.networkInterfaces.each{ nic ->
