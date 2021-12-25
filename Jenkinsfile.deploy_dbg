@@ -41,7 +41,7 @@ pipeline {
 						def vnfcs0 = AS_MANIFEST['spec']['vnfs'][0]['rgs'][0]['vnfcs']
 						def vnfcs1 = AS_MANIFEST['spec']['vnfs'][0]['rgs'][1]['vnfcs']
 						def vnfcs = (vnfcs0 << vnfcs1).flatten()
-						println(vnfcs)
+						//println(vnfcs)
 						// Create a Map of VNFC by name
 						def vnfcsByName = vnfcs.inject([:]){ result, vnfc ->
 							result[vnfc.name] = vnfc
@@ -50,6 +50,8 @@ pipeline {
 						def serviceAddresses = AS_MANIFEST.spec.vnfs[0].appConfig.serviceAddresses
 						//serviceAddresses.each{
 						def netDesc = ""
+						def ipParam =  [:]
+						def paramName = ""
 						def networkElements = AS_MANIFEST.spec.vnfs[0].appConfig.networkElements
 						networkElements.each{ ne, info ->
 							info.managers.eachWithIndex{ manager, mgrIdx ->
@@ -59,11 +61,15 @@ pipeline {
 									println(mgrIdxStr)
 								}
 								if(manager.containsKey("internalOamAddress")){
+									paramName = "RAF_${ne.toUpperCase()}${mgrIdxStr}_IP"
+									ipParam[paramName] = $manager.internalOamAddress
 									netDesc +="RAF_${ne.toUpperCase()}${mgrIdxStr}_IP: $manager.internalOamAddress ($ne internalOamAddress)\n"
 								}
 								if(manager.containsKey("serviceAddressName")){
 									def serviceAddress = serviceAddresses.find{ it.name == manager.serviceAddressName }
 									netDesc +="RAF_${ne.toUpperCase()}${mgrIdxStr}_IP: $serviceAddress.ipv4 ($ne ${mgrIdxStr} serviceAddressName, $serviceAddress.name)\n"
+									paramName = "RAF_${ne.toUpperCase()}${mgrIdxStr}_IP"
+									ipParam[paramName] = $serviceAddress.ipv4									
 								}
 								manager.instances.eachWithIndex{ instance, istIdx ->
 									vnfcsByName[instance.server].networkInfo.networkInterfaces.each{ nic ->
@@ -72,11 +78,14 @@ pipeline {
 											istIdxStr = "${istIdx}_"
 										}
 										netDesc +="RAF_${ne.toUpperCase()}${mgrIdxStr}_${istIdxStr}IP: $nic.ipv4Address ($nic.subnetName on $instance.server)\n"
+										paramName = "RAF_${ne.toUpperCase()}${mgrIdxStr}_${istIdxStr}IP"
+										ipParam[paramName] = $nic.ipv4Address
 									}
 								}
 							}
 						}
 						println(netDesc)
+						println(ipParam)
 					}
 				}
 			}
