@@ -86,6 +86,11 @@ pipeline {
 						}
 						println(netDesc)
 						println(ipParam)
+						for (entry in ipParam) {
+                                echo entry.key
+								echo entry.value
+                            }
+                        }
 					}
 				}
 			}
