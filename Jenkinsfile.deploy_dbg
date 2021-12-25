@@ -62,14 +62,14 @@ pipeline {
 								}
 								if(manager.containsKey("internalOamAddress")){
 									paramName = "RAF_${ne.toUpperCase()}${mgrIdxStr}_IP"
-									ipParam[paramName] = $manager.internalOamAddress
+									ipParam[paramName] = "$manager.internalOamAddress"
 									netDesc +="RAF_${ne.toUpperCase()}${mgrIdxStr}_IP: $manager.internalOamAddress ($ne internalOamAddress)\n"
 								}
 								if(manager.containsKey("serviceAddressName")){
 									def serviceAddress = serviceAddresses.find{ it.name == manager.serviceAddressName }
 									netDesc +="RAF_${ne.toUpperCase()}${mgrIdxStr}_IP: $serviceAddress.ipv4 ($ne ${mgrIdxStr} serviceAddressName, $serviceAddress.name)\n"
 									paramName = "RAF_${ne.toUpperCase()}${mgrIdxStr}_IP"
-									ipParam[paramName] = $serviceAddress.ipv4									
+									ipParam[paramName] = "$serviceAddress.ipv4"								
 								}
 								manager.instances.eachWithIndex{ instance, istIdx ->
 									vnfcsByName[instance.server].networkInfo.networkInterfaces.each{ nic ->
@@ -79,7 +79,7 @@ pipeline {
 										}
 										netDesc +="RAF_${ne.toUpperCase()}${mgrIdxStr}_${istIdxStr}IP: $nic.ipv4Address ($nic.subnetName on $instance.server)\n"
 										paramName = "RAF_${ne.toUpperCase()}${mgrIdxStr}_${istIdxStr}IP"
-										ipParam[paramName] = $nic.ipv4Address
+										ipParam[paramName] = "$nic.ipv4Address"
 									}
 								}
 							}
