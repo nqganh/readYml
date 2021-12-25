@@ -3,7 +3,7 @@ import org.yaml.snakeyaml.DumperOptions
 
 pipeline {
     agent {
-		label 'skullken_node'
+		label 'yml_node'
 	}
 	parameters {
         string(
