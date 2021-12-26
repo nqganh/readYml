@@ -1,4 +1,4 @@
-import RafManifestYml
+//import RafManifestYml
 pipeline {
     agent {
 		label 'yml_node'
