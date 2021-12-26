@@ -1,17 +1,18 @@
-pipeline { 
+pipeline {
     agent none 
     stages {
-        stage('Run MiniTAF_SK'){
-            agent {
-                docker {
-                    image 'minitaf-image:lates'
-                }
-            }
+        stage('Example Build') {
+            options{ 
+                        timeout(time: 4, unit: 'SECONDS')
+                    }
             steps {
-				script {
-					echo 'Hello, Skull'
-				}
-			}			
+                echo 'Hello, Maven'
+            }
+        }
+        stage('Example Test') {
+            steps {
+                echo 'Hello, JDK'
+            }
         }
     }
 }
