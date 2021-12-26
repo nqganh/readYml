@@ -1,5 +1,14 @@
+import util
 pipeline {
-    agent none 
+    agent {
+		label 'yml_node'
+	}
+	parameters {
+        string(
+            defaultValue: 'raf_fullgression_F_225.yml',
+            description: "Manifest file name",
+            name: 'MANIFEST_NAME')
+    }
     stages {
         stage('Example Build') {
             options{ 
