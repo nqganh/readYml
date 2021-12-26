@@ -8,10 +8,10 @@ pipeline {
                 }
             }
             steps {
-		script {
-		    echo 'Hello, Skull'
-		}
-	    }			
+				script {
+					echo 'Hello, Skull'
+				}
+			}			
         }
     }
 }
