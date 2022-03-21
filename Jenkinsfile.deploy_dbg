@@ -101,7 +101,6 @@ pipeline {
 			}
 		}
 		stage('Example Test2') {
-			mcp = "abc"
             failFast true
             parallel {
             stage('Branch A') {
@@ -117,7 +116,7 @@ pipeline {
 			}
 			post {
 				always {
-					echo "${mcp}"
+					echo "abc"
 				}
 			}
 		}
