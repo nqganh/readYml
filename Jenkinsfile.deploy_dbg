@@ -101,25 +101,21 @@ pipeline {
 			}
 		}
 		stage('Example Test2') {
-			steps {
-				script{
-					mcp = "abc"
+			stage('Branch AA') {
+				steps {
+					script{
+						mcp = "abc"
+					}
 				}
 			}
             failFast true
             parallel {
-                stage('Branch A') {
-                    agent {
-                        label "for-branch-a"
-                    }
-                    steps {
-                        echo "On Branch A"
-                    }
+            stage('Branch A') {
+                steps {
+                    echo "On Branch A"
                 }
-                stage('Branch B') {
-                    agent {
-                        label "for-branch-b"
-                    }
+            }
+             stage('Branch B') {
                     steps {
                         echo "On Branch B"
                     }
