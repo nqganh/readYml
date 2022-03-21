@@ -1,5 +1,6 @@
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.DumperOptions
+def mcp
 
 pipeline {
     agent {
@@ -97,6 +98,37 @@ pipeline {
 		stage('Example Test') {
 			steps {
 				echo 'Hello, JDK'
+			}
+		}
+		stage('Example Test2') {
+			steps {
+				script{
+					mcp = "abc"
+				}
+			}
+            failFast true
+            parallel {
+                stage('Branch A') {
+                    agent {
+                        label "for-branch-a"
+                    }
+                    steps {
+                        echo "On Branch A"
+                    }
+                }
+                stage('Branch B') {
+                    agent {
+                        label "for-branch-b"
+                    }
+                    steps {
+                        echo "On Branch B"
+                    }
+                }
+			}
+			post {
+				always {
+					echo "${mcp}
+				}
 			}
 		}
 	}   
