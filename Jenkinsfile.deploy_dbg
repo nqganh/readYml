@@ -127,7 +127,7 @@ pipeline {
 			}
 			post {
 				always {
-					echo "${mcp}
+					echo "${mcp}"
 				}
 			}
 		}
