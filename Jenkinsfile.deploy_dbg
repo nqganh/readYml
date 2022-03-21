@@ -101,13 +101,7 @@ pipeline {
 			}
 		}
 		stage('Example Test2') {
-			stage('Branch AA') {
-				steps {
-					script{
-						mcp = "abc"
-					}
-				}
-			}
+			mcp = "abc"
             failFast true
             parallel {
             stage('Branch A') {
