@@ -1,0 +1,1632 @@
+---
+## Schema: stack_api/stack_api/schemas/kinds/vnfs/as/kinds/GenericAsVnf/generic_as_vnf.schema.yml
+## render_manifest.py rendered THIS file: kvm/Vnf/kvm_as_simplex_RG_1_VM_1_NE_7.yml
+## NOTES:
+##   1) '#'  indicates default schema value shown, was used
+##   2) '##' indicates a comment
+apiVersion: v1
+kind: GenericAsVnf
+metadata:
+  name: as_generic_vnf_ASTL5_34
+dependencies:
+  providers:
+  - name:   kvm_provider_access_ASTL53
+    networks:
+    - name: kvm_oam_network_ASTL53
+    - name: kvm_private_network_ASTL53  # Uncomment if needed
+  - name:   kvm_provider_access_ASTL54
+    networks:
+    - name: kvm_oam_network_ASTL54
+    - name: kvm_private_network_ASTL54  # Uncomment if needed
+spec:
+  # vnfcFlavors:
+  # - name:           AS_2Core_8Ram_160
+    # numberOfCpus:   2
+    # memory:         8192
+    # disk:           120
+    # secondary_disk: 40
+  operation: Deploy
+
+  vnfs:
+  - name: AsVnf
+   ## image can be specified in: vnfs, rgs, vnfcs. Most specific is used.
+   #image:
+    systemConfig:
+      auditConfig:
+        enable:         false
+       #remote_enable:  false        # Forward auditd logs to remote server
+       #remote_address: 1.1.1.1      # Req'd if remote_enable true
+       #remote_port:    60           # Req'd if remote_enable true
+      banner:
+     #  ## If no 'banner:' object, default Linux banner used
+        name: as-banner.txt
+        data: CkF1dGhvcml6ZWQgdXNlcnMgb25seS4gQWxsIGFjdGl2aXR5IG1heSBiZSBtb25pdG9yZWQgYW5kIHJlcG9ydGVkLgoK
+      caaRadiusProfiles:
+        default:
+          authenticationMode: local-only
+       #advanced_properties_example:
+       # #authenticationMode: local-only
+       #  authorizationMode:  local|central
+       #  ## Radius host should be defined if CAA config is defined for MCP/PROV GUI, even if platform CAA mode is local-only.
+       #  radiushost:
+       #    name:    radiushost      # Profile name
+       #    address:      <ipv4>
+       #    sharedSecret: mysecret
+       #   #retries: 1
+       #   #timeout: 3
+       #  radiusproxy:
+       #    enable: false            # If true, need min 1 servers, 1 clients entries
+       #    servers:                 # Central servers to proxy
+       #    - address:      <ipv4>  
+       #      sharedSecret: mysecret
+       #    clients:                 # Clients to serve
+       #    - address:      <ipv4>  
+       #      sharedSecret: mysecret
+       #  users:                     # Access central usernames on a machine with this profile
+       #  - username1                # NOT: root, ntappsw, ntdbsw, postgres, barman, pgbouncer, sysadm and
+       #  - username2                # NOT: appConfig.users.platform.userlist.*.username
+      dscpMarkingProfiles:
+        default:
+          dscpStatus: Enabled
+          dscpCategories:
+            networkSignalling:  48
+            lowLatencyData:     18
+            highThroughputData: 16
+      ntpServer:
+        primaryIp:   172.28.153.132
+        secondaryIp: 172.28.153.133
+      passwordPolicy:
+        lcredit:     1
+        dcredit:     1
+        ucredit:     1
+        scredit:     1
+        difok:       4
+        minlen:      14
+        maxrepeat:   3
+        maxrepeatcr: 4
+        deny:        3
+        unlock_time: 0
+        remember:    5
+        maxage:      60
+        minage:      7
+        warning:     7
+        lockage:     30
+      sshdConfig:
+        maxStartups: 10
+        maxSessions: 10
+      syslog:
+        enableSyslog: true
+        syslogServerIp: 127.0.0.1                  # Req'd, if enableSyslog true
+      timezone:
+        region: America
+        area:   Catamarca
+      backupProfiles:
+        sampleBkupConfASTL53:
+          enabledBackupSets:              # Req'd, if backupProfiles used
+          - fsi                           # platform|kpi|acct|dbdir|seclog|svr|fsi|full
+          - full
+          base:                           # All base fields req'd, if backupProfiles used
+            targetAddress:   172.29.70.29
+            targetUser:      "ntsysadm"
+            targetPassword:  "RAPtor1234"
+            targetDir:       /var/mcp/remote_bkups/
+            cpuThreshold:    0.99
+            memoryThreshold: 0.8
+        sampleBkupConfASTL54:
+          enabledBackupSets:              # Req'd, if backupProfiles used
+          - fsi                           # platform|kpi|acct|dbdir|seclog|svr|fsi|full
+          - full
+          base:                           # All base fields req'd, if backupProfiles used
+            targetAddress:   172.29.70.30
+            targetUser:      "ntsysadm"
+            targetPassword:  "RAPtor1234"
+            targetDir:       /var/mcp/remote_bkups/
+            cpuThreshold:    0.99
+            memoryThreshold: 0.8
+          # fsi:                            # Eg. add another config
+            # targetAddress:   1.1.1.1
+            # targetUser:      "root"
+            # targetPassword:  "1234"
+            # targetDir:       /var/tmp
+          # platform: ...
+      scheduleBkupProfiles:
+        scheduleBkupConfASTL53:
+        - jobName: fsi                    # platform|kpi|acct|dbdir|seclog|svr|fsi|full
+          targetAddress:     172.29.70.29
+          targetUser:        "ntsysadm"
+          targetPassword:    "RAPtor1234"
+          targetDir:         /var/mcp/remote_bkups/
+          weekDay:           "Mon"        # Mon|Tue|Wed|Thu|Fri|Sat|Sun|All
+          hour:              "08"
+          minutes:           "29"
+          cpuThreshold:      0.99
+          memoryThreshold:   0.8
+          bkupTrickleRate:   5000
+        - jobName: full
+          targetAddress:     172.29.70.29
+          targetUser:        "ntsysadm"
+          targetPassword:    "RAPtor1234"
+          targetDir:         /var/mcp/remote_bkups/
+          weekDay:           "Mon"
+          hour:              "08"
+          minutes:           "30"
+        scheduleBkupConfASTL54:
+        - jobName: fsi                    # platform|kpi|acct|dbdir|seclog|svr|fsi|full
+          targetAddress:     172.29.70.30
+          targetUser:        "ntsysadm"
+          targetPassword:    "RAPtor1234"
+          targetDir:         /var/mcp/remote_bkups/
+          weekDay:           "Mon"        # Mon|Tue|Wed|Thu|Fri|Sat|Sun|All
+          hour:              "08"
+          minutes:           "29"
+          cpuThreshold:      0.99
+          memoryThreshold:   0.8
+          bkupTrickleRate:   5000
+        - jobName: full
+          targetAddress:     172.29.70.30
+          targetUser:        "ntsysadm"
+          targetPassword:    "RAPtor1234"
+          targetDir:         /var/mcp/remote_bkups/
+          weekDay:           "Mon"
+          hour:              "08"
+          minutes:           "30"          
+        # - jobName: platform
+          # targetAddress:     3.4.5.6
+          # targetUser:        "root"
+          # targetPassword:    "RAPtor1234"
+          # targetDir:         /var/tmp
+          # weekDay:           "Fri"
+          # hour:              "15"
+          # minutes:           "28"
+      ipsecProfiles: 
+        sampleIpsecProfile:
+          authenticationType: "RSA"        # RSA|PSK
+          RSA:                             # Req'd for RSA: RSA, p12File, password, file
+            p12File: 
+              password: '1234'
+              file:
+                name: ipsec.p12
+                data: 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
+            caCerts:
+              - name: caCert.pem
+                data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUZuakNDQTRhZ0F3SUJBZ0lKQU9ESG1iZEpjTnJMTUEwR0NTcUdTSWIzRFFFQkN3VUFNR1F4Q3pBSkJnTlYKQkFZVEFrTkJNUXN3Q1FZRFZRUUlEQUpQVGpFTE1Ba0dBMVVFQnd3Q1QxUXhEekFOQmdOVkJBb01CbEpKUWtKUApUakVSTUE4R0ExVUVDd3dJVTBWRFZWSkpWRmt4RnpBVkJnTlZCQU1NRGpFM01pNHlPQzR4TkRFdU1qQTFNQjRYCkRURTVNRGd5TXpFMk5UVXlOMW9YRFRJNU1EZ3lNakUyTlRVeU4xb3daREVMTUFrR0ExVUVCaE1DUTBFeEN6QUoKQmdOVkJBZ01BazlPTVFzd0NRWURWUVFIREFKUFZERVBNQTBHQTFVRUNnd0dVa2xDUWs5T01SRXdEd1lEVlFRTApEQWhUUlVOVlVrbFVXVEVYTUJVR0ExVUVBd3dPTVRjeUxqSTRMakUwTVM0eU1EVXdnZ0lpTUEwR0NTcUdTSWIzCkRRRUJBUVVBQTRJQ0R3QXdnZ0lLQW9JQ0FRQzFSVGxZdUhhalBDRkwyalRTYng2R050MHpGaTRCNk8vMWJvcm4KNzlxbUJQa3AvbmJNVVA0aFJ6ZXBjQjhidjRKQ3hHbWIwRTQ1bWVlSHlFNXR0em05TlNITU9OdHU3K0E3YXpmRAo1aE85T3NuWnF2OUhpSkRqamovb0J1QzdKNGlNZEp5RzNLeUJDRFJWV0k4ZHNCenJwc01YdUF2SHdVcHhkWjd3CjNRV1FFQytsd0MxZCtFUzFMNXlwaDdtK09oMk1TUVl6MTJkZ0tKVU5ROThBaUVXRWtQMldEYUpIZ0NWaUZuMnYKVzVxVWZ4WUJCRkdydWUyK2JzQVQ5S2ZKUDNFQjB2ZWxQRkdJV0hXRVdxMk1lRkgxRXJSWXZtcjlHUlUvRlRUSwpQcnBBM0MzakVNSm5VTnd4STZ4MkJYODNpM3B0K3VKaE9HbU9lMjFhOUFMeFJUT3NXRmliMTRlUklnd04yVktVCk9mc3lMNmNocXJ6b0psRkk4Y01ZUGxIZGhOTjBQSnZENG5iSnFMSlJ6Z0cvUUpLQnBCT1RVUCt2RXErOEV5cmkKcXU3bjlwelRJeG00SlBKUFRhZ2k3V3hDUlZlemQ5dEEva2loNDVBWHRJSnRXV0dnYkhROFZmRFNxbzJSMXcvNgpTeWhRT08rU2FpVUV4UGJMREhrVEw0SnJBcWtqYTRQYjBKUWc3dWVYVFBTUXNQMktZdytWNVYxM2VlR0NoUk9BCjBFMW90SDQ5dzJnZ3JaQ2paYmFXdjkyNXNRS3p5SHJ4cUJybVN0VnU5eHZ2UjdSNXpqUGRoVkZTeHJzOE9uQ0oKOFdRQkpSM090Yk9kTWRDd3puZkJYWllGV3NIL2M5eC9LNVhzN0todmRienZ4T1lJTjF3TWJoczFmcUo4blZ2MQp2TFB0NXdJREFRQUJvMU13VVRBZEJnTlZIUTRFRmdRVURWb2xTWWpPUk16dVdQQ1RGaStNODRGOGlzWXdId1lEClZSMGpCQmd3Rm9BVURWb2xTWWpPUk16dVdQQ1RGaStNODRGOGlzWXdEd1lEVlIwVEFRSC9CQVV3QXdFQi96QU4KQmdrcWhraUc5dzBCQVFzRkFBT0NBZ0VBQXJtd3FxNVJ0MVFacDhSQXFaQWxvRVVPZk5uK21JTnNkNGp5aFZhcgpIajBIQkFpY1lleGtkQjVBZ3NVTzFQR0NMcTdzRVJ1UTZkOEg4Tm5WdW1ZSUZnUGFyNlorVmQvb0ROVFJrVXN5Ck5kY1kyUHpKcUpHbzF3U2N0aVRrWC9vQnYyMVJmMkdOSjE3L1Z6TUF6bzU4c0JhT0ZEYkRNb2xTNFV0d21UeHgKVDAweGJ4V2pRTU9ZakhoZ0o4ZWE2ZkpuS0UzRkRTNmVBaUdZTkkreDU4TDVBZXduZHhPL1MxQkxuS250N1VlNApCSU1oeHBSTTZWNDZJYWlTeW1aa3ZNa3c5Q2dWWWJpQklQMHlrNmxVNUpqaHhhLzhvTTNRNDNwMHAxK0VPTWJhCkpuZmNuVnB0bU9hVll2UTVxZEJ5ZitObjlsRTVsb2ttZTRFQXF0TDVTbTQ2Y2dYT3E4OW1VYU0wemFhUnF4R0MKSFZWN2Y1RTRXU0QyTlBmUWFsSjJQeEJ4S0lOc2dXOFV1NDRKeVIyN0FMQXdEVlZLWlg1OTZaV2tKVStKZXN0aworZDVZc1QvcDJ1L2htandaeThPZjdQMFRpNUNCbUhDaW5LZXpYNmR4cTlDV1dSWEsrQTVqRUFtQVVRZWczSWg5ClJOSjdTWG0wYW92K1JWcGI2WFNMQzFaS1lKU2JyRW9tV2hUcWtpYW4vTVNvYVNXdk4wRVE3QXVUTUZDelhuQjkKclNvVk5NOW1OT0F1L1hjWjVJUElQVjdaQkhnU1plNy8wVk9TR09IV2VRRXVHYm5XRFRML0w1OHI0Y1N2a1hSNQpSQU5pa2lyTTFaYi80R0pJK2hlNUxGWVRlQnp1Tk1SVnNoZy9aY2FQdW9jUFdBVGo5SSt2VFFVQ241WitLbFV0CnBHRT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+              # - name: caCert2.pem
+                # data: xxx                  # base64 --wrap=0 caCert2.pem, paste data: xxx
+            # crls:
+              # - name: crlCert.pem
+                # data: xxx                  # base64 --wrap=0 crlCert.pem, paste data: xxx
+        # sampleIpsecProfile2:
+          # authenticationType: "PSK"        # Req'd for PSK: preSharedKey
+          # preSharedKey: '0x12345'
+      ipsecConfFiles: 
+        externalConfFile:
+          name: myExt.conf
+          data: IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjCiMgU0FNUExFIENPTkZJRyBGSUxFIEZPUiBFWFRFUk5BTCBJUFNFQyBUVU5ORUxTCiMKIyBpbnZva2UgbWFuIGlwc2VjLmNvbmYgZm9yIGluZm9ybWF0aW9uIG9uIGFsbCB0aGUgb3B0aW9ucwojCiMgTk9URTogYSB0YWIgY2hhcmFjdGVyIGlzIHVzZWQgZm9yIGluZGVudGF0aW9ucwojIHNldCB0aGUgYXR0cmlidXRlIHRvICIiIHRvIG92ZXJyaWRlIHRoZSBkZWZhdWx0cwojIGRlZmluZWQgaW4gL2V0Yy9zdHJvbmdzd2FuL2lwc2VjLmNvbmYKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKCiMgU0FNUExFIFRVUExFIC0gIFVOQ09NTUVOVCBUTyBVU0UKIyBUaGlzIHNhbXBsZSBhc3N1bWVzIGxlZnQ9bG9jYWxob3N0IGFuZCByaWdodD1yZW1vdGVob3N0CiNjb25uIGV4dF9jb25uMQojCWxlZnQ9NDcuMTA0LjMwLjE0OQojCXJpZ2h0PTQ3LjEwNC4yMi4xMzUKIyAJbGVmdGNlcnQ9IkVYUEVSaVVTIENvcmUgLSBVLlMuIEdvdmVybm1lbnQiCiMJcmlnaHRjZXJ0PSIiCiMJbGVmdGlkPSJDPVVTLCBPPVUuUy4gR292ZXJubWVudCwgT1U9RG9ELCBPVT1QS0ksIE9VPUNvbnRyYWN0b3IsIENOPUVYUEVSaVVTIENvcmUiCQojCXJpZ2h0aWQ9IkM9VVMsIE89VS5TLiBHb3Zlcm5tZW50LCBPVT1Eb0QsIE9VPVBLSSwgT1U9Q29udHJhY3RvciwgQ049cmVtb3RlaG9zdCIJCiMJZXNwPWFlczI1Ni1zaGEyNTYhCiMJaWtlPWFlczI1Ni1zaGEyNTYtbW9kcDE1MzYhCiMJcGZzPW5vCiMKIyBOb3RlOgojICBBIGNvb25lY3Rpb24gbmFtZSBtdXN0IHN0YXJ0IHdpdGggdGhlIHByZWZpeCAiZXh0XyIuIFRoZSB0b3RhbCBsZW5ndGggb2YgYQojICBjb25uZWN0aW9uIG5hbWUgbXVzdCBiZSBubyBtb3JlIHRoYW4gMTUgY2hhcmFjdGVycy4K
+        # externalConfFile2:
+          # name: myExt2.conf
+          # data: xxx                        # base64 --wrap=0 myExt2.conf, paste data: xxx
+      snmpProfiles:
+      - name:        ribbonsec
+        port:        161
+        readString:  ribbon
+        writeString: ribbonrw
+      - name:        tnquang
+        port:        213
+        readString:  ribbonq
+        writeString: ribbonrwq       
+
+    appConfig:
+      vnfrFilename: vnfr-22.03-release_as_15.0-b274.tar.gz
+      certificates:
+        p12FileCerts:
+        - name:     SIPCert
+          password: '1234'
+          file:
+            name: sipcert.p12
+            data: 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
+        - name:     HTTPsCert
+          password: '1234'
+          file:
+            name: devcert.p12
+            data: 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
+        rootCa:
+          name: as-rootca.pem
+          data: |
+            TUlJRm5qQ0NBNGFnQXdJQkFnSUpBT0RIbWJkSmNOckxNQTBHQ1NxR1NJYjNEUUVCQ3dVQU1HUXhDekFKQmdOVgpCQVlUQWtOQk1Rc3dDUVlEVlFRSURBSlBUakVMTUFrR0ExVUVCd3dDVDFReER6QU5CZ05WQkFvTUJsSkpRa0pQClRqRVJNQThHQTFVRUN3d0lVMFZEVlZKSlZGa3hGekFWQmdOVkJBTU1EakUzTWk0eU9DNHhOREV1TWpBMU1CNFgKRFRFNU1EZ3lNekUyTlRVeU4xb1hEVEk1TURneU1qRTJOVFV5TjFvd1pERUxNQWtHQTFVRUJoTUNRMEV4Q3pBSgpCZ05WQkFnTUFrOU9NUXN3Q1FZRFZRUUhEQUpQVkRFUE1BMEdBMVVFQ2d3R1VrbENRazlPTVJFd0R3WURWUVFMCkRBaFRSVU5WVWtsVVdURVhNQlVHQTFVRUF3d09NVGN5TGpJNExqRTBNUzR5TURVd2dnSWlNQTBHQ1NxR1NJYjMKRFFFQkFRVUFBNElDRHdBd2dnSUtBb0lDQVFDMVJUbFl1SGFqUENGTDJqVFNieDZHTnQwekZpNEI2Ty8xYm9ybgo3OXFtQlBrcC9uYk1VUDRoUnplcGNCOGJ2NEpDeEdtYjBFNDVtZWVIeUU1dHR6bTlOU0hNT050dTcrQTdhemZECjVoTzlPc25acXY5SGlKRGpqai9vQnVDN0o0aU1kSnlHM0t5QkNEUlZXSThkc0J6cnBzTVh1QXZId1VweGRaN3cKM1FXUUVDK2x3QzFkK0VTMUw1eXBoN20rT2gyTVNRWXoxMmRnS0pVTlE5OEFpRVdFa1AyV0RhSkhnQ1ZpRm4ydgpXNXFVZnhZQkJGR3J1ZTIrYnNBVDlLZkpQM0VCMHZlbFBGR0lXSFdFV3EyTWVGSDFFclJZdm1yOUdSVS9GVFRLClBycEEzQzNqRU1KblVOd3hJNngyQlg4M2kzcHQrdUpoT0dtT2UyMWE5QUx4UlRPc1dGaWIxNGVSSWd3TjJWS1UKT2ZzeUw2Y2hxcnpvSmxGSThjTVlQbEhkaE5OMFBKdkQ0bmJKcUxKUnpnRy9RSktCcEJPVFVQK3ZFcSs4RXlyaQpxdTduOXB6VEl4bTRKUEpQVGFnaTdXeENSVmV6ZDl0QS9raWg0NUFYdElKdFdXR2diSFE4VmZEU3FvMlIxdy82ClN5aFFPTytTYWlVRXhQYkxESGtUTDRKckFxa2phNFBiMEpRZzd1ZVhUUFNRc1AyS1l3K1Y1VjEzZWVHQ2hST0EKMEUxb3RINDl3MmdnclpDalpiYVd2OTI1c1FLenlIcnhxQnJtU3RWdTl4dnZSN1I1empQZGhWRlN4cnM4T25DSgo4V1FCSlIzT3RiT2RNZEN3em5mQlhaWUZXc0gvYzl4L0s1WHM3S2h2ZGJ6dnhPWUlOMXdNYmhzMWZxSjhuVnYxCnZMUHQ1d0lEQVFBQm8xTXdVVEFkQmdOVkhRNEVGZ1FVRFZvbFNZak9STXp1V1BDVEZpK004NEY4aXNZd0h3WUQKVlIwakJCZ3dGb0FVRFZvbFNZak9STXp1V1BDVEZpK004NEY4aXNZd0R3WURWUjBUQVFIL0JBVXdBd0VCL3pBTgpCZ2txaGtpRzl3MEJBUXNGQUFPQ0FnRUFBcm13cXE1UnQxUVpwOFJBcVpBbG9FVU9mTm4rbUlOc2Q0anloVmFyCkhqMEhCQWljWWV4a2RCNUFnc1VPMVBHQ0xxN3NFUnVRNmQ4SDhOblZ1bVlJRmdQYXI2WitWZC9vRE5UUmtVc3kKTmRjWTJQekpxSkdvMXdTY3RpVGtYL29CdjIxUmYyR05KMTcvVnpNQXpvNThzQmFPRkRiRE1vbFM0VXR3bVR4eApUMDB4YnhXalFNT1lqSGhnSjhlYTZmSm5LRTNGRFM2ZUFpR1lOSSt4NThMNUFld25keE8vUzFCTG5LbnQ3VWU0CkJJTWh4cFJNNlY0NklhaVN5bVprdk1rdzlDZ1ZZYmlCSVAweWs2bFU1SmpoeGEvOG9NM1E0M3AwcDErRU9NYmEKSm5mY25WcHRtT2FWWXZRNXFkQnlmK05uOWxFNWxva21lNEVBcXRMNVNtNDZjZ1hPcTg5bVVhTTB6YWFScXhHQwpIVlY3ZjVFNFdTRDJOUGZRYWxKMlB4QnhLSU5zZ1c4VXU0NEp5UjI3QUxBd0RWVktaWDU5NlpXa0pVK0plc3RrCitkNVlzVC9wMnUvaG1qd1p5OE9mN1AwVGk1Q0JtSENpbktlelg2ZHhxOUNXV1JYSytBNWpFQW1BVVFlZzNJaDkKUk5KN1NYbTBhb3YrUlZwYjZYU0xDMVpLWUpTYnJFb21XaFRxa2lhbi9NU29hU1d2TjBFUTdBdVRNRkN6WG5COQpyU29WTk05bU5PQXUvWGNaNUlQSVBWN1pCSGdTWmU3LzBWT1NHT0hXZVFFdUdibldEVEwvTDU4cjRjU3ZrWFI1ClJBTmlraXJNMVpiLzRHSkkraGU1TEZZVGVCenVOTVJWc2hnL1pjYVB1b2NQV0FUajlJK3ZUUVVDbjVaK0tsVXQKcEdFPQo=
+      configParms:
+        GeoRedundancy:           true
+        EnableLastLoginDisplay:  true
+        IgnorempRules:           true
+        EnforceTLSRenegotiation: true
+        RegisterSuccessBilling:  true
+        GenerateAuditLogs:       true
+      domain: tnquangg
+      hardening:
+        enableAIDE: true          # default: false
+        ## NOTE: For oampCipherSuites, signalingCipherSuite, TLS_RSA_WITH_AES_128_CBC_SHA is always enabled
+        oampCipherSuites:         # Ciphers to enable. Others disabled. See NOTE.
+        - "SSL_RSA_WITH_RC4_128_MD5"
+        - "SSL_RSA_WITH_RC4_128_SHA"
+        signalingCipherSuites:    # Ciphers to enable. Others disabled. See NOTE.
+        - "TLS_RSA_WITH_NULL_SHA"
+        externalOAMPCipherSuites: # Ciphers to enable|disable
+        - name: "SSL_RSA_EXPORT_WITH_DES40_CBC_SHA"
+          enabled: true
+        httpsCipherSuites:        # Ciphers to enable|disable
+        - name: "SSL_RSA_EXPORT_WITH_DES40_CBC_SHA"
+          enabled: true
+      jitcEnabled:  false
+      licenses:
+        asLicenseFile:
+          name: as_license.txt
+          data: V0FSTklORzogRE8gTk9UIE1PRElGWSBUSElTIEZJTEUNCg0KW14gR2VuZXJhdGlvbiBJbmZvOiBEYXRlOjIwMjAtMDUtMzFUMDA6MDA6MDAgSWRlbnRpdHk6IEEyIERlc2lnbiBDb21tZW50czogSU5URVJOQUwgR0VOQkFORCBMQUIgVVNFIE9OTFkgXl0NCg0KTElDRU5TRSBCRUdJTlMgQkVMT1cgVEhJUyBMSU5FDQpkajAxTGpFdU1DQ1JqME1HVFphWlcySmoxMHpQdjlJSG1mUUNMSVBoRVEzczVaNVJ3eG1UMjFsb1JNVnNaTHNpY0NxVXdqWDc0SzdoQ2ZicWhKZDNJYmc5VHRDTHltS3JKWTYwc1BDRVpHT1cwdWk2MG1IS3BZaWx0WFBSb3E3NGk0L2QzVFpaRlhSTURsdmdxdERZNmRUME5TVkNjK1pNbTdmQWZYdmFnS0xvS0VTNEpUN0wxVnE2MGh5a3lYMVJ3cUliS2d6dCtPbjk4OStqYVRwK3h4eXBOc2hYaUtKL3dwVSs5NHYxM3BmOHFVdmR4RkJncTR5U3RxalNnK1ZqS1JEOW5pczlxU3p5L0R2N0E1WDNzNzVraTg4VzdwUG43Y2NjblJmbHhRbEw3S1NTTE1jN1lqT2FHYThoR3UzN0hGR24zM0RuNFRXU1lVRFVrYzQwMEZxNjBoeWt5WDFSd3FJYktnenQrT245ODkramFUcCt4eHlwTnNoWGlLSi93cFUrOTR2MTNwZmtRazdvWlNDcmRyZ3FPOFZyU3ZPcjlwbmxyakRJTjlzd2hIZEhpRlJQWld1N05MenNBR3JQeGdGd3VDL1ZSZzJwbHdoTE1POWZhdkxFNzJadXdiNjlZSHY3SkY0LzBuQ3dnb1RXc3FFSjR2TEU3Mlp1d2I2OU5tK0dBU1NiemZickpEZFJBYXhsOVZVYW9oSW9PMU1JYlgzWXkyK0ZRZTQ2KzdBZGwvRDhxSE9GN2FuM3VsNStmQllHTDJhY2FjVFNEZ0lBYWF6UXdjYUIxaUcwK0RZZFJEN2prSjg2TCtvRGlQd2NvR3pNVThhQjFpRzArRFlkUkQ3amtKODZMK283TkxuYUZCeDFrN0NLMXN3WjFWM0V5bEpGOEMzcG1SY2pCbk5TN2tvTkdIWUQwUzlkdklZUm5IYnBDaHRXMmFlSkZySklPV3JIbkR5aEdwbW54L2ZQMWtESFJqc3VxTFBWNE8vdjYyNnlKRi9TUTlZZ2psTlBaMnlKbG9wb1dnc1lPeFp4UElZR2wvSHhKODN3K2RQUmVZWEFHNmQ5NzloVFBmWk1venNmQ3pjVWt5ejFJbXZDY1NOVTRxelBrQWt3bGZxcUNpVTJObHlwcnRsdVl1ZVQ2R09nZ2JQOTNjRURzVm9LU1JJNVNOeis2NEJRYkJ2Rjc2WHZwcnpwZllaeXpvTUlqQXJuelV2emQ5ZjhIN2lGT2ZuM05PUDlpWDArL2FHTXkyOWN6VXZ1MHpDMDM4eFJqMnRVeDJ5UHpPZ3JQY3NBN1N1UGFMZ2lnbzAvTEJKTEVBcHJnQ1I3WGVISU1RdHgycFNtZzAzSGw3TlpyRjk3S1EwUW5ldVFxNGh2ZWtmV2lNVUlIdmF6c1gxVTlMSlNDRUZLL01tMG9rMS8xUi9JZEVBSzkrWU91UWtCckZLT0c2Mm9kRjgxajZieCtZVFJMdUN4T1RQSHlJRS9VQit6dDFVajJYM0lpQXhBLzlWd0N3NWRrM3RvNThKblhYbmVVbmNJWkl1SzNHazBxeittMTJuZDIvSDVoTkV1NExFNTRkQlBVdlFwY3lJOFhRc1VXKzg2dExNSmlTN2ZhY2V3a2IydXBaNUFtMFpqdndIeGx0bENTTENDaE5heW9RbmlMRWZ1c0lRSFhOdGpnMjNUdEZLdDJIdFBvb1lFdUp0dTZOc3lQZ3RYa2NnV2oyWnFiU1U5R0JmWjlPeXZPNEd6RGswTUhrNFJzd3dSR201NEpESUQ2bDVpNi9XVWxIOG1oMDJUVHNOSG9EWWR1WWJabjRaQU94cU9GdThnQjlabUVYb3RHeE5kVnBucTIranFwNk92Z3hnSUFCU1VMYi9tYkVuMHZ6NEszNHFQZVQ1TVlLQmlkQkVhYm5na01nUHFYbUxyOVpTVWZ5YUhUWk5PdzBlZ05oMjVodG1maGtBN0dvNFc3eUFIMW1ZUmVpMGJFMTFXbWVyYjZPcW5vNitEWndVcHNmdEtTRG8xbE9BMWFtajJRdVlVUy9peTNBWXphWUJsTDNPR21DZ0w5VmdDSzZ4ZHBEb0tURmd1TndxR2VKaTF1V1NYaVVtZDNhajAyTnUzY2pjV2p4cXorVHY2MWdxRmJ6R25tRm5hQVRXQStmZ0NXQk1GTVhxMlZ6OE5aY1hsaUs1K0RVSnVKZjNheXduZ1BDbm9mWXBwZ2JTM2srbTkxVTl0a1NOWm5rRXJqY0t1T3VBMXNOSTBhWFBIbEpnQkZ0ZnhTd2srbjRQUVpTVWYvbGswWmE5RHZTdmc1L2lNSitrSkZZdm1GRXY0c3R3R00ybUFaUzl6aHBnb0MvVllBaXVzWGFRNkNreFlMamNLaG5pWXRibGtsNGxKbmQybzlOamJ0M0kzRm84YXMvazcrdFlLaFc4eHA1aFpDMGF0KzQ4T1FkVnNTZlMvUGdyZmlsRUo0US8rL2JWc0lhMnZWVkhYNUtkeUdWZ1VRNnp3UkZDcDNxY1g1anZjbEpnQkZ0ZnhTd24rWWdSbmVFank3ZnQvYnVTc2hFaCtUTmUxSXJMUFBtK1pPWU84bDlsZDFBZHNzQmVCYjhRekF0c081THk4RTlmQkJYTnJtZDFKSW5qb0d3eTBLZkFyWXBGeVAvMDBGTXFsbGRuSEdHVnpFbUpiKzh6TnNzTmQxZ3FGYnpHbm1GbCtyQ1VpbFVmL3BvaS81MlV2MDlGc2d4MGVpQXlndjdmcTIranFwNk92ZzcybFI5Zk1zZWNHaGYxV0FHbkR4WFUrbjRQUVpTVWYvdXJiNk9xbm82K0R2YVZIMTh5eDV3YW9JVEZvK1U2dk9GbVNPUXlwejBSZFRwQ3RkWTF1ajgxbHhlV0lybjROUXJzbTFqellLYXlobTVyWkN3TzBDUmNocmE5VlVkZmtwM0laV0JSRHJQQkVVS25lcHhmbU85eVVtQUVXMS9GTENmNWlCR2Q0U1BMdCszOXU1S3lFU0g1TTE3VWlzczgrYjVmY05MWDMrV2F1UlhvdlRaSUQ0ekxiZUF1b2s3NXV6aDd4WHVVaDBJei9JYTJ2VlZIWDVLZHlHVmdVUTZ6d1JGQ3AzcWNYNWp2Y2xKZ0JGdGZ4U3duK1lnUm5lRWp5N2Z0L2J1U3NoRWgrVE5lMUlyTFBQbThOOUZrZDE4UjN5V1hGNVlpdWZnMUNFZHZ3L2R3Z1A0OXNTZlMvUGdyZmlsQUhQWkw3MWhYL1JnbkhuNGRiOHQ0UGRoMSs2UUZtV2t6WHRTS3l6ejV2ajlWTXBEVHBtUVo0bUxXNVpKZUpTV04wN29Ib1FKZWNGQStSUzJqM1NJUGc2NXBJNERHQXJXWEY1WWl1ZmcxQ2JpWDkyc3NKNER3cDZIMkthWUcwdDVQcHZkVlBiWkVqV1o1Qks0M0NyanJnTmJEU05HbHp4NVNZQVJiWDhVc0pQcCtEMEdVbEgvNC9URmRpWkpua1p4RDlic1Z0eHBNdVpjWGxpSzUrRFVKdUpmM2F5d25nUENub2ZZcHBnYlMzayttOTFVOXRrU05abmtFcmpjS3VPdUExc05JMGFYUEhsSmdCRnRmeFN3aytuNFBRWlNVZi9ua2I1WnJHMjVJeElPTG1qVHZVQk0yeDRlQXBkMkk4N2FTbmc3ZWdyZVYzeWRIbVVZUzQ3bE1IYkxBWGdXL0VNNHRGY005dU51Qy9lT2diRExRcDhDdGlrWEkvL1RRVXlxV1YyY2NZWlhNU1lsdjd6TTJ5dzEzV0NvVnZNYWVZV1IwckxaSnVhNFdwVE5lMUlyTFBQbS85dFoweGlqT2pzOVlLaFc4eHA1aFp6OFFTWCtkd2ZqTHRaZjR3aHdYelVhVU1tY2ZsMVZTY3A0WFRubkh2cE45UUR0cExlLzVlRThLSkJ1MFp2aWxZYkVuMHZ6NEszNHBRQnoyUys5WVYvMFlKeDUrSFcvTGVEM1lkZnVrQlpscE0xN1Vpc3M4K2I0L1ZUS1EwNlprR2VKaTF1V1NYaVVsWUhNNGUvekRBeDZTbmc3ZWdyZVYzZzB5aVRVM0hUcjdWbmhKL2diaExSdXJiNk9xbm82K0RUcWVUaVRWY3dCN0NpUWJ0R2I0cFdHeEo5TDgrQ3QrS28yVU5Lanp1OUNvNGtNMEdpdFFObzl0NEM2aVR2bTdPbzdRcEsrVHNCSFlqYzhSbENPRS9Rc0FWQ2hBOUhDNXI2dHZvNnFlanI0TVZIMWlWUVl0UVFWbWVRU3VOd3E0NllYcWswbEFoMjFKT3FhdlQrUUVWOW1tN085eVgvN2wwZVBmUTZMSktFRVhXQ29Wdk1hZVlXVHJJdWc1R1lSaGNvOTA3MEhPbTBBb0hiTEFYZ1cvRU02M3JNZmV3bUdyV1Ura1NCTlQ5cFlvSGJMQVhnVy9FTTZ4V012UVNDV0huSGp2TmM3MVlqcksxa0Q1WDAvbytWZnU4SWJOR1BVRWh2RWtIWDZJZzVLNmhqRGxYRkI0UHJJdWFjdURvN0JDRi9ZVWVXenYxdS9EN3ZDR3pSajFCSWJ4SkIxK2lJT1N1SUhKZXJYQUUwN1dMbW5MZzZPd1FoVzlhTk1rRU9pMDF0ODBYQ0g4aG5Icnc5UzdPRUFldEFwQU5TZnJuS1J5QTZESzJldk1Xb2wwUUpVTlFleTBoYm14SjlMOCtDdCtLVUFjOWt2dldGZjlHQ2NlZmgxdnkzbGtlU1ArQ2xVckZRMTB0ek9TNzVwMHNyc1BYZlZrUVpseDV0S2M1ejRzaGlpT0VaRDMwcGthSFQyRVRGTDFQT0FIVXdGZ3gyWHdhUTEwdHpPUzc1cDBzcnNQWGZWa1FacFJPYmtwS0NBVzhKM3RmZGwxaGM2eWlEU3owMFo0ZmwwZ2NXbVlqRFlxN0UyYjUxSmV1YWd5THNFYjNMMzd3Z2wyRW41T2VGNkJiQ2NkTXpSZTZwTktyam14UjJCQmdvMm1BWlM5emhwZ29DL1ZZQWl1c1hhUUFDZ0daTGJTelVkRlRvQTRaUmVXZjVCeEJLQzY3Tjl2cTIranFwNk92ZzV6Y28rd2YyU2crM2R4VnFWSzNIZzVrclBQY3VCWTJwU2RXT3JmS0FkcWRaY1hsaUs1K0RVSnVKZjNheXduZ1BDbm9mWXBwZ2JTM24yQXRiRGdjUThxcnFqK1ROUUg0b0JmWWNNKzltajVPMWdxRmJ6R25tRm56QUtsalM3T0lrb3V0bE5STTFFUDhranR5K1FpWms4bWlSRStSOStLYnJkdDRDNmlUdm03T283UXBLK1RzQkhZamM4UmxDT0UvUXNiS0d4bXZTeFhaZzB5aVRVM0hUcjR6RC9GQTBuQkdBcUpmMm9RRDdqZDFlanhSejhLcjVnMEhiTEFYZ1cvRU00WkdkajlFNGhyWmJFbjB2ejRLMzRwUUJ6MlMrOVlWLzBZSng1K0hXL0xlQXZBc2RabEk3d1V2ejgzV2RZTFRQb1YrK3I2MUhuK0JaZmRNVnBMcGVrakcvaGJ6ZjUzTHNINlF0bGhobXAvbkd5U0NwbDR3SFRDWEV3UWE5NS8vb3hFYWJuZ2tNZ1BxWG1McjlaU1VmeVpoaXN3U243aWdJdFlLaFc4eHA1aFp3blJNVnZBelE2UkdHUGlVdVBodWk2bTE0NlZ4WFRMNkt6S2dEMTErWG53SGJMQVhnVy9FTTVTZWVPSFZobnNPcTQ1c1VkZ1FZS05wZ0dVdmM0YVlLQXYxV0FJcnJGMmtBQW9CbVMyMHMxSFJVNkFPR1VYbG4rUWNRU2d1dXpmYjZ0dm82cWVqcjROM2R5Zm4zOEpJQTR1dGxOUk0xRVA4dlRuU1B0KzNjdG04Z3dUTGdIQklhUWRzc0JlQmI4UXpyRll5OUJJSlllY2VPODF6dlZpT3NuaitKS0RJQktZcUlPTG1qVHZVQk0zQ0lQWkFoczVQRXo2Zmc5QmxKUi8rMGtwb1FNT1QwQXVMclpUVVROUkQvQUNnbjhUcDNkWE90bkZFVmRhNjVSOVAyenhkQkU4UFUyWEY1WWl1ZmcxQ2JpWDkyc3NKNER3cDZIMkthWUcwdDU5Z0xXdzRIRVBLcTZvL2t6VUIrS0FYMkhEUHZabytUdFlLaFc4eHA1aFpBaEcyZHR2QzdveUo4ZExPeTBnSmhYcXFHeDZRdXlPb3BVOEFtNXR3eWJCakxVUnZtdHE5c0FaZEk5YkZwYjNqQjJ5d0Y0RnZ4RE9zVmpMMEVnbGg1eDQ3elhPOVdJNnllUDRrb01nRXBpb2c0dWFOTzlRRXpjSWc5a0NHems4VFBwK0QwR1VsSC80VUxBU1pBM3duNS9NVXJ5bkpSem5MUFRja251OHp6bXF5d3JYc0RrS2Z4Zy9Mak04bGw5QXRPbGZnQmoyejlENGhyYTlWVWRma3AzSVpXQlJEclBCRVVLbmVweGZtTzl6cTIranFwNk92ZzcybFI5Zk1zZWNHcUNFeGFQbE9yemhRRE1Halk4Q2NGYXYySVE1Y3JFTWhBa2N4R3RLcWszU1NEamJGV21JTWVjQVA3SEhNRTF2cDMyL3VTTnh0QTVtTkh3OEthRURTRlF2MVdBSXJyRjJrQUFvQm1TMjBzMUhSVTZBT0dVWGxuK1FjUVNndXV6ZmI2dHZvNnFlanI0Tm9VeEE0M0RxWUI5SHMycndaZU1NSmtGTFZhazVmenNHSmVteHlRL1NDNW1YRjVZaXVmZzFDYmlYOTJzc0o0RHdwNkgyS2FZRzB0NTlnTFd3NEhFUEtxNm8va3pVQitLQVgySERQdlpvK1R0WUtoVzh4cDVoWkhjNlAzcVAzZTRNdHlFcHVoWXc2dVp6cDcyeHEwTWUyY3ZjRXdJSnFBL05seGVXSXJuNE5RbTRsL2RyTENlQThLZWg5aW1tQnRMZWZZQzFzT0J4RHlxdXFQNU0xQWZpZ0Y5aHd6NzJhUGs3V0NvVnZNYWVZV2ZZMW1Hcjl6andHM1lRVDlvc3dXQnhJeEdmaHE1SFlWYkFLZUxUZk5TTERCSDZQZHhDN0tXVmx4ZVdJcm40TlFtNGwvZHJMQ2VBOEtlaDlpbW1CdExlZllDMXNPQnhEeXF1cVA1TTFBZmlnRjlod3o3MmFQazdXQ29Wdk1hZVlXVHJJdWc1R1lSaGM3bC8rQVVtR0FqYUxyWlRVVE5SRC9PZ1NSNGpjMXVpeWNWK0dPSFQzdXB3SGJMQVhnVy9FTTZ4V012UVNDV0huSGp2TmM3MVlqcko0L2lTZ3lBU21LaURpNW8wNzFBVE53aUQyUUliT1R4TStuNFBRWlNVZi9tRmdtdVpYNU8xM0NTZW1oOE0ycVRIcHcybkhRcUx6ZTRXWXdKcnN5Ky9pWGY2ZzcrbGdRNGQ0NkJzTXRDbndLMktSY2ovOU5CVEtwWlhaeHhobGN4SnllTy9TL2tTaU4ybTdPOXlYLzdsMG9UdlhPckptcmlNNkRFcUVFbzRIUEpkWjYvZ1VHSUgwVzNMSjZjdVRvWFNTRGpiRldtSU1lUTlUTDJvbG9paGszZHhWcVZLM0hnN2JlQXVvazc1dXpxTzBLU3ZrN0FSMkkzUEVaUWpoUDBMR3loc1pyMHNWMllOTW9rMU54MDYrTXcveFFOSndSZ0xzeHBtNEVabytDUTlUTDJvbG9paGszZHhWcVZLM0hnNmJLaENwYUJxZlhBM2lzWmFRNEY4MUlhMnZWVkhYNUtkeUdWZ1VRNnp3UkZDcDNxY1g1anZjNnR2bzZxZWpyNE85cFVmWHpMSG5CcWdoTVdqNVRxODRJT0JyanV6dVcxcWRBZWdPSTVhT2RQMFVISEU5dlQwclY5YUgxWXFBQUhWU203aEdQc2I1NXIybFI5Zk1zZWNHU0I2SU9CNW5tbStwa09VazNOazlEL0Z1UXNKT1ZlZHY2RFg5eU9DSWZ4cjNhbE5aMnpVellIRGFJNkt6N2VrMGM1ZS9JZ0xGZFpGRGI3UWJHTGR1REwzSGZqMzlKYklKaVNON3ZuMkdDVnRFWmlnUDlZTGhRcWh3SWlQZ1RvcE1KRllxNStwMlJJZEV1RVdlNnQ4UjVhZDZ4dEl4cEhucmpHV1djRXdybVY2OXgzNDkvU1d5Q2I5LzdpYUN4R2t6SFhyV2ZiN0JwV25pZy9jak1GajJkRlk5UWVkYkxmb3RLOWtEVW5BUlAvUnJCVTkyaFA3bG1pcmhSSXJwYnRRK1dvY01ZQTFLVkpzNWpIYThxNDdOMC9GdVFzSk9WZWR2UW1OekJiVGhDTjJDYlJLVy96a1pNc01UdUdSZkwrVk56SjBzTGRiYk0vM3VZcmcxNlFHeklBcGxOV2E5RTk5TzhxaEVZSFg0TW5JUUs1YUprRnlBK2pzV2Jha09MNmNoS2dzQUkyc1NGMWhqd1dvbGFEZTlmM3Q4ZFE1L0NXNXFLNy9LZUVpNFoxeFVTNExoTWw2cVkzSFgzdVRTYitDb0RoMnNDakFOamxrbmNSaUloOTg0TWZ3aDM2QjJpNTdvTGJDci9KWERESmFMV0tzVGF1OTlSSDRUMXE0TnF0emwrMjU2Z3gwTWdqVFVLd0tpSjVJMTN6Q1pQVXhEaVNPOGZoUFdyZzJxM09YN2JucURIUXlDTk5RckFxSW5ralhmOS9HQ3E4L1NrZmc3Rm0ycERpK25JWm0rWDlSZzVuMllPeFp0cVE0dnB5SDl4Z3ZSZldIbHBSeE5vSy9WOEtKTWdtMFNsdjg1R1RJajk2Q1VmYXloQ0V0SVBycFJsTGltekowc0xkYmJNLzNHWittYllwaDhYRGdmTytTZk42QnhqcTNIRzEzMkVjNWorSllZS2pVeitrcS9jdnJVVDlIQkZsT3RpeGF2aEdrZ1RROFB1dWJUMm4zcFNITDJOazBxUFFYQ1RLbDVDWVFuY1JpSWg5ODRNVFdPSWY1OTBFUldRMlBtMW50RDgrUGRldzFNOHRVQ3lrd0VmMmtiUG5vM2UxK1NIb3pZSEdWUUhyTDg1MHNUT1kwRlNUdUVUV0tMbkZ5RFNCRU1uZ0I5UHhqRFI3V28wWTdkc0pnUzdiRUhBVE1rYWFGVXN0SEpxczNMcU15VFRiMUd2WDA3Uzc3QWZEQ3hMWDFxdUFHTkJVazdoRTFpaSs2WlNmTDFxVDdBbEdDVXN5b1BOZ3FqTEV5Z3o0alo1Q01sYStaYXptVzJUQVIvYVJzK2VqZmZGSSthYy9rb2tKMzE1YlljcE9MY2dtMFNsdjg1R1RKQ0tVZ0ZkOVVIWHAzMTViWWNwT0xjQVRNa2FhRlVzdEUrcGg4eGgwQk9oOTdmS1Q5dlprZmIvRGEzaVMzT05SbGhsdnZWam9UUFBzK3dhRHZaT2MwRjc4eFdwRUIvZGJoU203aEdQc2I1NXQ5QWpsSFF4SlNRK0NGNDltZDFDTG91RVdhSkl4cmJaNzNIZmozOUpiSUorQnF6eU5PTTVnYjRJWGoyWjNVSXVwZHlpUGkrUFN2MXAyenB6Vk9mYjg2eURobFFuSWhuV01pSWhrMW83OElmeWxLSGk3RWRUUnYxUmdCcUg1THJ2YURBcFp5TUc4REZoVmx3UmdlUWVDbms2Z1UwNDFXK0cwd0VmMmtiUG5vM2VNRE1pQnd2cUZJN0ZtMnBEaStuSWR3RUEzTkF0TWhzNFMyakpxU1VBZFNDYlJLVy96a1pNaDVVT3g4bVBKZDU3aEkyMDNKYUF4RE1uU3d0MXRzei9SQzkxOUNUYkdvL24wek5LQ3F1R0hhbmZFODE1WUU4bGRMSUJUNjBBZXY5N0VieS9PaTRRRDBGaklkMHZPRXQrUElPL1g3L2ppWVBuMGxMUldxMXgxamRya2tZWmVLUjBhaHdJaVBnVG9wTWFOZG1rRWg5RmtvbW5qK2pmdXpZcityYjZPcW5vNitEYUFHTjIvektQMDM5Z3hYaFBXejRCT3JiNk9xbm82K0RWMG4wV0VDeTkzQm9Ca0lnaTIyMjNQMkRGZUU5YlBnRTZ0dm82cWVqcjROYkh2RXJ0aWQrTEV3RWYya2JQbm8zTWV4VlVqODhaK0JNQkg5cEd6NTZOMy9CcjV5WTltbHJKM0VZaUlmZk9ESGZCOFF1NEZsOGxqc1diYWtPTDZjaE1kWGRZVjRiVUhoZ09DWUpPOTBzSUV3RWYya2JQbm8zdlVEZXg4WGxmSXhkSHppeW5RTlgvMDlsV21UWHl4M0w0czlhMU8xNk5GNGxmbXRxcUZSV2p0YWs1bDNKYUlKU1FXbEY4aCtvTnUyYlgwamtsaGt3NlV3RWYya2JQbm8zWG5iKzZzbkR0NXhNQkg5cEd6NTZONUc0SU45WDdseHFDSzR1emREYUIwZzdGbTJwRGkrbklRSVRydjBxZ0pwcmFINDNJangrTXVoZmNYbE5zVzhLNkMySEtDUzZoVC82RW13TVQyT1JwZWJkYTd4Z01qLzVDSHQ4ZFE1L0NXNXFrQ2crZjQrT29QbVhiWG94TTlUYUNVd0VmMmtiUG5vM0ZzQWNFR1FNWTFXeU9MSFFUTHFwQXRFM1p2dlExTXJCT3hadHFRNHZweUdDbytYSWFxTEtXYkdXeklyZHI3dUlPbkdaanE5UXd6TklCWE5XQmZreEMxR204bVd6cHBrbWNVYXN0U1l2SXgwN0ZtMnBEaStuSVZUNWM4YkZuTzNzODltYkxHZFRaY05NQkg5cEd6NTZOMzl0Tk5yK0ZKT1U3NHdwOW81OTYxUGhjN3hqNHlmZFVGbng4WG9uSnpQOU94WnRxUTR2cHlFeERsMkhMUGYzVkZtZVFTdU53cTQ2VmFITDQyK2JXL2lTb3RzVjhIKzJxeDI1aHRtZmhrQTdVcHU0Umo3RytlWnpLYTM5RUd4OUZDY3owVEVaMUE1NE51aTR4Yy8yeS9mYlJGcEFEVE1IakFZaWhVY0FqU1BuZ2FyWm1yOGJhUTVNQkg5cEd6NTZON0tXU0I4MEMwc05UQVIvYVJzK2VqZjllT29qSUxpM3pZSnRFcGIvT1JreU1TMkdiZnV5M2hwNE1ncDg2VEhyS0tuckhtTFVSZjFmOGE0ZWxVZlZhS0twNng1aTFFWDlYeCtwLzhEYXZPWVloN0pXUllWbG4yRUhiTEFYZ1cvRU02eFdNdlFTQ1dIbkhqdk5jNzFZanJKNC9pU2d5QVNtS2lEaTVvMDcxQVROd2lEMlFJYk9UeE0rbjRQUVpTVWYvcEgvRTQ5bHAvL1dtVjdTb3NWby9raU9VOXV1YlZhSW1oQTlyajVYY0xwRWp1VmNBdXNkT0ROcGdHVXZjNGFZS0F2MVdBSXJyRjJrQUFvQm1TMjBzMUhSVTZBT0dVWGxuK1FjUVNndXV6ZmI2dHZvNnFlanI0UFptcXJaRDNYWGpWYU94SG0yazhvSmJFbjB2ejRLMzRxSlBmRnVmSGNQNWllTjh6czE0RVdEZU9nYkRMUXA4Q3Rpa1hJLy9UUVV5cVdWMmNjWVpYTVNjbmp2MHY1RW9qZHB1enZjbC8rNWRLRTcxenF5WnE0akdpZnZkZlo0YjJmM3dPTXU5NUIzcTVJU2lKNDh3cHFpS3lFcEFhZXdVRjhNcDNLRG5xUllhZ2p0RG5YbHg3NE9kdlYxWTBKQmZOa1JHbTU0SkRJRDZsNWk2L1dVbEg4bVlZck1FcCs0b0NMV0NvVnZNYWVZV2NKMFRGYndNME9rUmhqNGxMajRib3VWbEFrSFVEUVNQZ3luY29PZXBGaHFDTzBPZGVYSHZnNTI5WFZqUWtGODJlYS9VclJ1OC9iS2x5ZkpQUStlWFg0bVN6QkNzdnp3b2o1dVJuZHFsellXMjNnTHFKTyticzZqdENrcjVPd0VkaU56eEdVSTRUOUN4c29iR2E5TEZkbURUS0pOVGNkT3ZqTVA4VURTY0VZQzBnNXFoWmVycHJ6dk9JK0VEcXM4SjBWWXlTN2VYdVZqeE1QNkxwUUFYdE5seGVXSXJuNE5RamsxZ2xLaG1GY0ZyZ0RnU3YyMDJFeFZCUHpEdndtdWYzYjFkV05DUVh6WkVScHVlQ1F5QStwZVl1djFsSlIvSm1HS3pCS2Z1S0FpMWdxRmJ6R25tRm5DZEV4VzhETkRwRVlZK0pTNCtHNkxnblVpVllCWVR1a2NFR1g5V3dlMDdVM25jekRwSmtMdWFlVWVyMWxWblcyT1U5dXViVmFJbXVZbGZ3bENLSTNFWmNYbGlLNStEVUp1SmYzYXl3bmdQQ25vZllwcGdiUzNuMkF0YkRnY1E4cXJxaitUTlFING9CZlljTSs5bWo1TzFncUZiekdubUZrMlY3U000YWhvaEVEaytVY29DZHNYaDdpcUdtNFpQWjlFQTFxWjlrdnRwdlhaSU5HeXFxdHRCMnl3RjRGdnhET3NWakwwRWdsaDV4NDd6WE85V0k2eWVQNGtvTWdFcGlvZzR1YU5POVFFemNJZzlrQ0d6azhUUHArRDBHVWxILzYwWEQvbkNqd28rUXI4RU85R1ZtN1hhWkxwQUR1S0JkWmFXUG9KbUZXeTR5Sm1OVHhKZGZhL3lKYzBPak54TE00aHJhOVZVZGZrcDNJWldCUkRyUEJFVUtuZXB4Zm1POXpxMitqcXA2T3ZnNzJsUjlmTXNlY0dxQ0V4YVBsT3J6aUVZdy9JTWhZbFVWSHVrUU5SamFOdWFHU3NKUVYyUnRTVHhuVnJwUFV1ZTRLSnowSHh6OXdNTnZvM2lPVmpyS1FSR201NEpESUQ2bDVpNi9XVWxIOG1ZWXJNRXArNG9DTFdDb1Z2TWFlWVdjSjBURmJ3TTBPa1JoajRsTGo0Ym91R0huZloveCtmSjVwUk1qajExRTFkWmNYbGlLNStEVUlWaDlYN0x2L2c2cG9qMWl1eU9oMkNCMnl3RjRGdnhET3NWakwwRWdsaDV4NDd6WE85V0k2eWVQNGtvTWdFcGlvZzR1YU5POVFFemNJZzlrQ0d6azhUUHArRDBHVWxILzd0NC80UnluYnZpbUJ5MUVmTFNITWZiRW4wdno0SzM0cVFBTHBZN0U1MGZ4NElnMDB6TTM3UmFZQmxMM09HbUNnTDlWZ0NLNnhkcEFBS0Faa3R0TE5SMFZPZ0RobEY1Wi9rSEVFb0xyczMyK3JiNk9xbm82K0ROZHZaK2xwVDcybUd5bTFjbEl4eGg4M01BbEF6UGIzNHA0WFRubkh2cE45cGdHVXZjNGFZS0F2MVdBSXJyRjJrQUFvQm1TMjBzMUhSVTZBT0dVWGxuK1FjUVNndXV6ZmI2dHZvNnFlanI0TW85bU91QVU0UVhHeEo5TDgrQ3QrSy9NdmkxRTQ3K2hWdGxEVnZIRUZNRm1tQVpTOXpocGdvQy9WWUFpdXNYYVFBQ2dHWkxiU3pVZEZUb0E0WlJlV2Y1QnhCS0M2N045dnEyK2pxcDZPdmc5cWJnelA0bmpYNGdvWXo3dXlMYW8yZmV3OWFJOHlOdzFWRlk0NStRR3ljei91cXY3QXhuNlFIYkxBWGdXL0VNNnhXTXZRU0NXSG5IanZOYzcxWWpySjQvaVNneUFTbUtpRGk1bzA3MUFUTndpRDJRSWJPVHhNK240UFFaU1VmL3NUMXFkYmxPWkszYVgyaXVXbUdUclUrc0dDK2xIOWxGTXpYZFRhaGRtVzNoMkNlQXhrSGV0V0VBd1FwdFk4WElmK0gxc2thWnNSMTIzZ0xxSk8rYnM2anRDa3I1T3dFZGlOenhHVUk0VDlDeHNvYkdhOUxGZG1EVEtKTlRjZE92ak1QOFVEU2NFWUNUN2oraTByblBWRjF2UWpnUHc5VW42amcrUkx6K2htbzRZZ1V6bXBTeEZsbHhlV0lybjROUXNpbzBhdGZzVW5ZZU0wQkJKeHNIZ0RiZUF1b2s3NXV6cU8wS1N2azdBUjJJM1BFWlFqaFAwTEd5aHNacjBzVjJUMnVYOEhVWjhtRDFncUZiekdubUZreE9uV25tdjg3VVhqTkFRU2NiQjRBQitVRm9oOXlkRmFWcEloSWxZQnh6aEVhYm5na01nUHFYbUxyOVpTVWZ5Wmhpc3dTbjdpZ0l0WUtoVzh4cDVoWjFNdElmeGdITW9qV0NvVnZNYWVZV1VrYXkzUTRZL3JLa2c0MnhWcGlESGxnT0NZSk85MHNJR2cvYUZOa29HcVpaY1hsaUs1K0RVSnVKZjNheXduZ1BDbm9mWXBwZ2JTM24yQXRiRGdjUThxcnFqK1ROUUg0b0JmWWNNKzltajVPMWdxRmJ6R25tRm4zSGpISWxSTEJrNDQ2Z2hLYkR3Y3JGcmVyRm9VcDlyNzBEd1ZJVElDcWZhYzRVTEFMYkxWc0lhMnZWVkhYNUtkeUdWZ1VRNnp3UkZDcDNxY1g1anZjNnR2bzZxZWpyNE85cFVmWHpMSG5CcWdoTVdqNVRxODRET0tqRkZvdFRWR25PRkN3QzJ5MWJJQzBtTncvdjlhMVBiTkU4Nk01cXY2cC82TzNmVDRhckJFYWJuZ2tNZ1BxWG1McjlaU1VmeVpoaXN3U243aWdJdFlLaFc4eHA1aFp3blJNVnZBelE2UkdHUGlVdVBodWk0SjFJbFdBV0U3cGpicnRYRFJuRWFoUGFCRSsxTlcvbTY4NDNlNi8zRE9adXR5STNZZ0tZS3YrbUtpb1VDZnNLQ0d0cjFWUjErU25jaGxZRkVPczhFUlFxZDZuRitZNzNPcmI2T3FubzYrRHZhVkgxOHl4NXdhb0lURm8rVTZ2T0N2UGdFU2xUS1NpRFFyb2psaGJOckhvOXFYbnhNckhFMUszbmxId3Foclh2enlKSzhCNnphM29qS1BnOGFmbTVwKzBSS1ZBWGZkQmJyRWZyODV0UG1YZU91cVdUVTlFK0dmK21sSUdiaGt1cTFLeE0ycDVKSFo1QUhLVFF2WThlVkFIUFpMNzFoWC9SZ25IbjRkYjh0NEM4Q3gxbVVqdkJVNExVU3pGUmUzTTFncUZiekdubUZrVjBCWmlhbGdiNTd0Zm5ielVvbkI3TXE2NTZheGpiRFpseGVXSXJuNE5RcTdFL2huZ0pRQ3N1MStkdk5TaWNIc3lycm5wckdOc05tWEY1WWl1ZmcxQ05rakUyWXZlY1NrZGEwMXpNTTJjK0RxQVFLN1BjYW9penJEcHZzS0I1UmErMnQxcGJYenBTNk8wS1N2azdBUjJJM1BFWlFqaFAwTEd5aHNacjBzVjJab0VzK3RZSXRmeFBwK0QwR1VsSC81eWxMdFNiYUd1MmxINVJEb3FtTVpCM3kzVUtGN1RhbDRIYkxBWGdXL0VNL2pGNFBlK1V4V2Vka2tXOUpFMWl2RExnYlhBWVJTeUNrcm92S2MyR3lYd3d2djcxUk5tcWFaU0Z6bzNtb09NZ0thNVUyUHo4WnMvcTFLeE0ycDVKSFo1QUhLVFF2WThlVkFIUFpMNzFoWC9SZ25IbjRkYjh0NEM4Q3gxbVVqdkJaekp3d2VnSjA1YVJoajRsTGo0Ym92SkpiN0NHTUFHWWZQdVE0dmx0VWJyR3BzYUVzUGlYSThWU3NkNWVPendMazYrQlBpUldKZzZzbXZPaGNGYVEzVXpndzFFbTVHeTlRSFVJL1RzQlJaOFNMMldYTGZEZm9pNFV4aDJCWTViL0Z0bUVNb1RiWlpRZTNkLzF1WXRwVWc3cXZwMXFYdjRHV0tSY2ovOU5CVEtwWlhaeHhobGN4SnllTy9TL2tTaU44VGFzTjVCYjYwUVpmZE1WcExwZWtnSEtjK05aTWhUdms5R0crQ2RhdlBRT0ZlU3ZVMEQxYmxzU2ZTL1BncmZpZ2NwejQxa3lGTytpQzhHSTZ0YktTbzJMc3JIU0ZpREdXWEY1WWl1ZmcxQ05rakUyWXZlY1NtVnpsQ2NZb1RxeWE3Umozc1VRaDZMQis2emlWZDZTODV1SmYzYXl3bmdQQ25vZllwcGdiUzNuMkF0YkRnY1E4bzY5WWx5UjJGVDNhRTcxenF5WnE0all1Wk43UjRwWTJTeWE4NkZ3VnBEZGRrSVh5cnEza09zK2pqODRqZjRsODVzU2ZTL1BncmZpZ2NwejQxa3lGTytUMFliNEoxcTg5QTRWNUs5VFFQVnVXeEo5TDgrQ3QrS1NpaUlGTGFSNnFWMUczeHc2UG9PNUVjR2Q2N1VHWGFUUXdIc3RjNG1OaEJ5R1ZnVVE2endSRkNwM3FjWDVqdmM2dHZvNnFlanI0TjliYk8xZmp1TjRqNmZnOUJsSlIvK2NwUzdVbTJocnRwUitVUTZLcGpHUWQ4dDFDaGUwMnBlQjJ5d0Y0RnZ4RFA0eGVEM3ZsTVZubEg1UkRvcW1NWkIzeTNVS0Y3VGFsNEhiTEFYZ1cvRU0wZmo3RzJmR2lISWZwQjNkcG1hU3NDSS84SjJSYjYvTHdmdXM0bFhla3ZPYmlYOTJzc0o0RHdwNkgyS2FZRzB0NTlnTFd3NEhFUEtxNm8va3pVQitLQ29JVEZvK1U2dk9NTkw5VWt4eXQ5LzJyNGVsVGd6OE1LYmxEbjc1QVo2Q0dvV3JvbEMycm5DWGVFS3dKWHJPZW5hdmg2Vk9EUHd3a3NrRW5ORDdxaFRpSGNtekZSVW1obHVzUit2em0wK1pjQjAwcUk0cy9lbHluVjBMcEtxOG5TclVyRXphbmtrZG5rQWNwTkM5ang1VUFjOWt2dldGZjlHQ2NlZmgxdnkzZ0x3TEhXWlNPOEZMOC9OMW5XQzB6NkZmdnErdFI1L2dXWDNURmFTNlhwSUJ5blBqV1RJVTc2SUx3WWpxMXNwS2pZdXlzZElXSU1aWmNYbGlLNStEVUtBNGxyeFJSZmdZaHVzai9XRTZ4Zk1tVGlrUjN0MkorRnNTZlMvUGdyZmlsQUhQWkw3MWhYL1JnbkhuNGRiOHQ0QzhDeDFtVWp2QlMvUHpkWjFndE0raFg3NnZyVWVmNEZsOTB4V2t1bDZTTklhdnA3MEduM1RodGR2Q20rcTBINkJYbTdPc0ZYK0t0R2hkWkU1bFVwSnNOejVHcHN0Qk9TakxFeWd6NGpaNUxsaGljNkZScmd1WmNYbGlLNStEVUp1SmYzYXl3bmdQQ25vZllwcGdiUzNuMkF0YkRnY1E4cXJxaitUTlFING9CZlljTSs5bWo1TzFncUZiekdubUZtanRLdXJrMEtRdnFGcjJkbXVwUzFwUFVNZUxvWms1cllucUdZRjU1cVpyOUdoZFpFNWxVcEpzTno1R3BzdEJPUUtQby94UWg2WHNXb1dyb2xDMnJuQ1ZLdTl4YW1iVnRiODNuMms5cVR3Z3lqa1B3TEFwSE5jQmlCa29Bank0ZTZzVmpMMEVnbGg1eDQ3elhPOVdJNnllUDRrb01nRXBpcXlPVThGV1NxQ1ZlcmI2T3FubzYrRGJVbzNPVUE1U3pEUkoyNUdPQXNZSFRLdXVlbXNZMncyWmNYbGlLNStEVUxkTHQzQ1k4M0JvR2xXbVd3VE5mSVJ5NEcxd0dFVXNncEs2THluTmhzbDhNTDcrOVVUWnFtbVhSME92ZGxaS1JvZHVhOVFYemk5SXJqVitlM3ZtK0F3YmlYOTJzc0o0RHdwNkgyS2FZRzB0NTlnTFd3NEhFUEtPdldKY2tkaFU5MmhPOWM2c21hdUk2eC9mZWNCU0RtSXNOejVHcHN0Qk9TYW90Q3R2NkZqQW9oM0pzeFVWSm9aRDNGZHB4OUpRYWwxdlFqZ1B3OVVuN2tRR3RreTdkUXpBZFFqOU93RkZueEl2WlpjdDhOK2lHVlpORUNQNE1vblprRHZWS2JwN1V6THQ3OUdla1ZjK0c0bC9kckxDZUE4S2VoOWltbUJ0TGVmWUMxc09CeER5Z0llSFA0TU9jaWtSaGo0bExqNGJvdEpCbG5JRmJhNDNybFpJeitPM29IcmYzbjI4WkVpL2tZOU55U2U3elBPYWpTSVVVQndTalJmMFNkdVJqZ0xHQjFFMWplMGVJVmhmN1NsRWh1UnpObTNUMDFrVVdNeXhHZ0U5czB5MktHREhEWXV5c2RJV0lNWnE5YjY2clgvV0lrTkcrdStuUGVRaGd2MVdBSXJyRjJrQUFvQm1TMjBzMUZXcWZvYzhteFpTek1QOFVEU2NFWUNUN2oraTByblBWRjF2UWpnUHc5VW4xVmgrL0lRcjlyMCtqajg0amY0bDg1c1NmUy9QZ3JmaW1DSWloZ0dMUXIvdUg4eUVOR1psR1NmdEVTbFFGMzNRVzZ4SDYvT2JUNWx4RGFiYUxtMnVvOGt2a2l6MjQ4K09xVzF2OCtJTUNKYURSdnJ2cHoza0lZTDlWZ0NLNnhkcEFBS0Faa3R0TE5Sa1hxRVF0bzNGd0dvSVRGbytVNnZPTXpvcU9la1lsdHJHWU1menBxVEN1WldoT1RTS1VUdWlyRzR5UzkraGhJcXpOZDFOcUYyWmJlNVdTTS9qdDZCNjBxaXpMaWt1OHpvcHA0RHlGQ1JHNVpVcTczRnFadFcxdnplZmFUMnBQQ0R5NEcxd0dFVXNncEZwby9RREFKTitUWDJvV0lUZlpGalhtTHI5WlNVZnlaaGlzd1NuN2lnSXRZS2hXOHhwNWhaQXNZMVRzZmRkbVJsOTB4V2t1bDZTR0NJaWhnR0xRci9ERG5USFI1QW9KM002OG9ENldzOXpnZHNzQmVCYjhReklFMFBEN3JtMDlvZzJ0VHpvUVpBRnpoWGtyMU5BOVc1YkVuMHZ6NEszNHFva2R1bXdRaXM5b3pjclIzTFFCU3ZKUERNSXRzT25LdzE5cUZpRTMyUlkxNWk2L1dVbEg4bVlZck1FcCs0b0NMV0NvVnZNYWVZV2JTWkVrMUg2Yno0ckg5OTV3RklPWWl3M1BrYW15MEU1QW8rai9GQ0hwZXhhaGF1aVVMYXVjS0dLSUlCODcwbGRobURIODZha3dybTFXVlB2eUViVmNBVlNzZDVlT3p3TGtpOWxseTN3MzZJWlZrMFFJL2d5aWRFMWplMGVJVmhmenlHdFVSWUR2NVFRd0hzdGM0bU5oQnlHVmdVUTZ6d1JGQ3AzcWNYNWp2YzZ0dm82cWVqcjROOVpHVVhoRzRpSVQ2Zmc5QmxKUi8raVRLa3B4aC9HSnIwV2hXR1hhYWJwRFl1eXNkSVdJTVpaY1hsaUs1K0RVTGRMdDNDWTgzQm9IRE9TcnlaNnZDejN5M1VLRjdUYWw0SGJMQVhnVy9FTTdkdUcwQ1VJd0NYQVVlTFBWYm9jU1FockYzVXkyVC9pVU1CN0xYT0pqWVFjaGxZRkVPczhFUlFxZDZuRitZNzNPcmI2T3FubzYrRG5KZnZ1TmFHeEg1UHVQNkxTdWM5VVhXOUNPQS9EMVNmdVJBYTJUTHQxRE1CMUNQMDdBVVdmTkdoZFpFNWxVcEpzTno1R3BzdEJPU2FvdEN0djZGakFvaDNKc3hVVkpvWmJyRWZyODV0UG1YRU5wdG91YmE2anhMSnl5Z2ZxdHlLS3VPRkk3RmtaVkE3cXZwMXFYdjRHV0tSY2ovOU5CVEtwWlhaeHhobGN4SnllTy9TL2tTaU42UlFLOFp1NEVpTjFncUZiekdubUZtanRLdXJrMEtRdm1sV21Xd1ROZklSeTRHMXdHRVVzZ3BLNkx5bk5oc2w4RFNJVVVCd1NqUmYwU2R1UmpnTEdCMHlycm5wckdOc05tWEY1WWl1ZmcxQ05rakUyWXZlY1NuNE5KWmplaDljaHdTL3JGQ0w2NjRSTzZyNmRhbDcrQmxpa1hJLy9UUVV5cVdWMmNjWVpYTVNjbmp2MHY1RW9qY1l3SHU1L0tzS2FtWDNURmFTNlhwSVlJaUtHQVl0Q3YrNGZ6SVEwWm1VWkorMFJLVkFYZmRCRDNGZHB4OUpRYWwxdlFqZ1B3OVVuMVZoKy9JUXI5cjAramo4NGpmNGw4NXNTZlMvUGdyZmlxaVIyNmJCQ0t6MnNBRUFNcmZKblBKUXZIWUltczRWUUw3YTNXbHRmT2xMbzdRcEsrVHNCSFlqYzhSbENPRS9Rc2JLR3htdlN4WFpsMjRZLzFTckM2cnEyK2pxcDZPdmcyMUtOemxBT1VzdzBTZHVSamdMR0IxRTFqZTBlSVZoZjdTbEVodVJ6Tm0zek5kMU5xRjJaYmU1V1NNL2p0NkI2Mzk1OXZHUkl2NUdQVGNrbnU4enptckMrL3ZWRTJhcHBodUdNdTBuRy95WjFycW56T3JwV2FXKzJ0MXBiWHpwUzZPMEtTdms3QVIySTNQRVpRamhQMExHeWhzWnIwc1YyVHp5eUprWXl3NWZQcCtEMEdVbEgvNkpNcVNuR0g4WW1pRGExUE9oQmtBWE9GZVN2VTBEMWJsc1NmUy9QZ3JmaW1DSWloZ0dMUXIvRERuVEhSNUFvSjNNNjhvRDZXczl6Z2Rzc0JlQmI4UXp0MjRiUUpRakFKZXRpbkVrNUQvcWZUa1VHa3FmMTdhcWVRQnlrMEwyUEhsUUJ6MlMrOVlWLzBZSng1K0hXL0xlQXZBc2RabEk3d1djeWNNSG9DZE9Xa1lZK0pTNCtHNkxTUVpaeUJXMnVONjVXU00vanQ2QjYwcWl6TGlrdTh6b3BwNER5RkNSRzVhR0tJSUI4NzBsZGhtREg4NmFrd3JtVm9UazBpbEU3b3F4dU1rdmZvWVNLazlOWkZGak1zUm9wRE10QUkvcTd0NEpGcHJkK0MvY2JIa0FjcE5DOWp4NVVBYzlrdnZXRmY5R0NjZWZoMXZ5M2dMd0xIV1pTTzhGU0JCN0FFMEpnZFRXQ29Wdk1hZVlXYU8wcTZ1VFFwQytjTTVLdkpucThMUGZMZFFvWHROcVhnZHNzQmVCYjhReklFMFBEN3JtMDlyMFdoV0dYYWFicERZdXlzZElXSU1aWmNYbGlLNStEVUkyU01UWmk5NXhLYkZsUVAyU1U5WG1PWkZwRmd4UUQ0d0dJR1NnQ1BMaDdxeFdNdlFTQ1dIbkhqdk5jNzFZanJKNC9pU2d5QVNtS2lRWEpKZndEZlU5cUNFeGFQbE9yempNNktqbnBHSmJheG1ESDg2YWt3cm0xV1ZQdnlFYlZjQVZTc2Q1ZU96d0x0R2hkWkU1bFVwSnNOejVHcHN0Qk9RS1BvL3hRaDZYc1dvV3JvbEMycm5DVkt1OXhhbWJWdFllZmUvMmJ2RVd3Ry9scU1VWWVzdkNvdWxMYlYwaHp6UnVKZjNheXduZ1BDbm9mWXBwZ2JTM24yQXRiRGdjUThwOUR6R0Vob2NBd1VZWStKUzQrRzZMU1FaWnlCVzJ1TjY1V1NNL2p0NkI2Mzk1OXZHUkl2NUdQVGNrbnU4enptbzBpRkZBY0VvMFg5RW5ia1k0Q3hnZFJOWTN0SGlGWVgrMHBSSWJrY3padDA5TlpGRmpNc1JvcVBEblVNbHZwYXZKdjhjV2pieWNQQVlnWktBSTh1SHVyRll5OUJJSlllY2VPODF6dlZpT3NuaitKS0RJQktZcUpCY2tsL0FOOVQyb0lURm8rVTZ2T016b3FPZWtZbHRyR1lNZnpwcVRDdWJWWlUrL0lSdFZ3QlZLeDNsNDdQQXUyeEl3bnFoRVgzeWk4Wmp6aG9jREtXeEo5TDgrQ3QrS1VBYzlrdnZXRmY5R0NjZWZoMXZ5M2dMd0xIV1pTTzhGTDgvTjFuV0MwejZGZnZxK3RSNS9nV1gzVEZhUzZYcElUZzE3cmxrVEpIdGx4ZVdJcm40TlFrbkJFOE8rUS9lRmpRVkpPNFJOWW9zZDdYK1pHWlY4OEd2dERkM2lZQ1JFMW5zeEMreks0Mm5sM2xtQ3Y3bzhuVHBYNEFZOXMvUStJYTJ2VlZIWDVLZHlHVmdVUTZ6d1JGQ3AzcWNYNWp2YzZ0dm82cWVqcjRPOXBVZlh6TEhuQnFnaE1XajVUcTg0cW83amhwTU10RFNiY2hvellvVGlXazlvRVQ3VTFiK2JrNS9iS1FKaEo1R1ZqVjdOWUNRTzNnZHNzQmVCYjhRenJGWXk5QklKWWVjZU84MXp2VmlPc25qK0pLRElCS1lxSU9MbWpUdlVCTTNDSVBaQWhzNVBFejZmZzlCbEpSLytMR1NKRjF5OUw3N29PKzd2cjJ2UDBUV1U0RFZxYVBaQ25sSlJnN3dQYzZmaUJ3V1VsTjMxVEdYRjVZaXVmZzFDYmlYOTJzc0o0RHdwNkgyS2FZRzB0NTlnTFd3NEhFUEtxNm8va3pVQitLQVgySERQdlpvK1R0WUtoVzh4cDVoWjk1ZVlYZzArQmNQL09VandJaGFneXpnWUZhbm01bUdvRFFEakJ6Nk9sc2F2bEM0b1BtOExseTNSRCtZZnY0NGJIZ2lEVFRNemZ0RnBnR1V2YzRhWUtBdjFXQUlyckYya0FBb0JtUzIwczFIUlU2QU9HVVhsbitRY1FTZ3V1emZiNnR2bzZxZWpyNFByYUNKKzVtdnB5NldTSXVXeXBTZU92NjVPNEJkZnRqd0hiTEFYZ1cvRU0rZ1ZOMmYrZWdHYjhuZHIwRzBhd1JrSGJMQVhnVy9FTTZ4V012UVNDV0huSGp2TmM3MVlqcko0L2lTZ3lBU21LaURpNW8wNzFBVE53aUQyUUliT1R4TStuNFBRWlNVZi9qRjIxTlB5YlZaOThuZHIwRzBhd1JrSGJMQVhnVy9FTTVRUG5yMXNaRnRGYVpMcEFEdUtCZFlSR201NEpESUQ2bDVpNi9XVWxIOG1ZWXJNRXArNG9DTFdDb1Z2TWFlWVdjSjBURmJ3TTBPa1JoajRsTGo0Ym9zaHEzdFhzSERkWU0vTzZhbkpiTlZzYnJFZnI4NXRQbVZWT2FaaExnVW9EYUkxdkZPR2kzemZJYTJ2VlZIWDVLZHlHVmdVUTZ6d1JGQ3AzcWNYNWp2YzZ0dm82cWVqcjRPOXBVZlh6TEhuQnFnaE1XajVUcTg0Nm9mSXVsQlhHUHVpTGtYaVBQZURraDRJZzAwek0zN1JYSlovRm9BK3NYZHNTZlMvUGdyZmlsQUhQWkw3MWhYL1JnbkhuNGRiOHQ0QzhDeDFtVWp2QlMvUHpkWjFndE0raFg3NnZyVWVmNEZsOTB4V2t1bDZTSHpyR08vcHJsRkNabThIZXh1RElzRmx4ZVdJcm40TlFtNGwvZHJMQ2VBOEtlaDlpbW1CdExlZllDMXNPQnhEeXF1cVA1TTFBZmlnRjlod3o3MmFQazdXQ29Wdk1hZVlXZHhQbjI4UTZQUU9lSmtXUWIraEplVXRkcnlQNmsxbDZ2Z2hlUFpuZFFpNm5pYlJ5ZWdWVzY0UWlQTDhtKzhYeGxGeWJ5YzlPZ3M5OFc1Q3drNVY1MjhGY3VvZU1jLzdVbXhKOUw4K0N0K0tVQWM5a3Z2V0ZmOUdDY2VmaDF2eTNnTHdMSFdaU084Rkw4L04xbldDMHo2RmZ2cSt0UjUvZ1dYM1RGYVM2WHBJd0hHR04wb3lEWnN6Vk1rVnE3eTZ3VG42L3ZVY1ZVTEVFUnB1ZUNReUErcGVZdXYxbEpSL0ptR0t6QktmdUtBaTFncUZiekdubUZuQ2RFeFc4RE5EcEVZWStKUzQrRzZMbFg0L0Z5cEtZMU1IYkxBWGdXL0VNNnRjUGVSTkRuZENDd2dOa040ZHBhdXBCakhEUTNmY0xtVHI0d1FSWVc4VGFZQmxMM09HbUNnTDlWZ0NLNnhkcEFBS0Faa3R0TE5SMFZPZ0RobEY1Wi9rSEVFb0xyczMyK3JiNk9xbm82K0Q0aTIrZEtMSmw3cElMRGhVMzY4UHhWaEZMVjZsSkw5U2NPeDNDWUtJdm91cExka0JxZnJhYVNIMUZYL3BRbUltWmNYbGlLNStEVUp1SmYzYXl3bmdQQ25vZllwcGdiUzNuMkF0YkRnY1E4cXJxaitUTlFING9CZlljTSs5bWo1TzFncUZiekdubUZuc1VUZFNMb01Ub0IrbDgrKzJKQ21HTlpUZ05XcG85a0ttbVQ3OEE2RGp4MlhGNVlpdWZnMUNiaVg5MnNzSjREd3A2SDJLYVlHMHQ1OWdMV3c0SEVQS3E2by9relVCK0tBWDJIRFB2Wm8rVHRZS2hXOHhwNWhaa2pSMTFyNHNBTXVZQnpkTk1uQkJTd2RnelFhUXl5VFlvY2VFcXpOWHJ6RUhiTEFYZ1cvRU02eFdNdlFTQ1dIbkhqdk5jNzFZanJKNC9pU2d5QVNtS2lEaTVvMDcxQVROd2lEMlFJYk9UeE0rbjRQUVpTVWYvc0FIYjMxSm5ZMHhwZkc4V1JwU3dEUlYxVWxpaGVlTVd5WW9kN2FQSHpvRTF0YlE0SzQycEpMYmVBdW9rNzV1enFPMEtTdms3QVIySTNQRVpRamhQMExHeWhzWnIwc1YyWU5Nb2sxTngwNitNdy94UU5Kd1JnS3ZsTUFEdmpGTG1FWVpkaVU4UHFmdzZTclFrbXZ3RTVVSGJMQVhnVy9FTTJtdXh5cW5XcVduZVhVeTVaY3RhMkI0NkJzTXRDbndLMktSY2ovOU5CVEtwWlhaeHhobGN4SnllTy9TL2tTaU4ybTdPOXlYLzdsMG9UdlhPckptcmlQOTNvT1FHdDVFbjNvbU1sczhIMHhHQldjbE83VFluQzEwaUQ5SDUxTFVxaVVBNWppZVlzY09CV2NsTzdUWW5DMXBnR1V2YzRhWUtBdjFXQUlyckYya0FBb0JtUzIwczFIUlU2QU9HVVhsbitRY1FTZ3V1emZiNnR2bzZxZWpyNE44L0VUaGp0eVZDQ1VBNWppZVlzY09CV2NsTzdUWW5DM0NTeE9wMDhLMXJVOHY0VFNJalFQRTIrMXBlU1dwUHBPcmpteFIyQkJnbzJtQVpTOXpocGdvQy9WWUFpdXNYYVFBQ2dHWkxiU3pVZEZUb0E0WlJlV2Y1QnhCS0M2N045dnEyK2pxcDZPdmcrUklHUXY3RXVtNlR5L2hOSWlOQThUYjdXbDVKYWsrazZ1T2JGSFlFR0NqZE9wVm5UaDdxYnh1U3VBQUdwWEpBVTlvRVQ3VTFiK2JhWUJsTDNPR21DZ0w5VmdDSzZ4ZHBBQUtBWmt0dExOUjBWT2dEaGxGNVova0hFRW9McnMzMityYjZPcW5vNitEOWU2OE1UVTgyOFZ1U3VBQUdwWEpBVTlvRVQ3VTFiK2J1cUJ3RW40L0tmdTl6cGUxYzJWeW1tb1dyb2xDMnJuQ0lhMnZWVkhYNUtkeUdWZ1VRNnp3UkZDcDNxY1g1anZjNnR2bzZxZWpyNE85cFVmWHpMSG5CcWdoTVdqNVRxODR3MXkvQ2dpMktReU1rbzRNdHhJZDdhSkVUNUgzNHB1dFNNUm40YXVSMkZVNzVMcTErbmJVeUlPMi9rS3lNZkFzWmNYbGlLNStEVUp1SmYzYXl3bmdQQ25vZllwcGdiUzNuMkF0YkRnY1E4cXJxaitUTlFING9CZlljTSs5bWo1TzFncUZiekdubUZsM1dqK1EzbU9LQVNTTitvMzNUbmRQTmFRU0VDZVJ3T3N5UTZxemlPRHdHMXlyRS9KNVZzMFYxdGJRNEs0MnBKTGJlQXVvazc1dXpxTzBLU3ZrN0FSMkkzUEVaUWpoUDBMR3loc1pyMHNWMllOTW9rMU54MDYrTXcveFFOSndSZ0tpWDlxRUErNDNkVHR2S0Z6b3dNWWF5SzBxdDQ0dDZxTUhiTEFYZ1cvRU05amlteFdBZWpmRnpTYXpOMWU0bE55REJLRGFFZWM2dTJtQVpTOXpocGdvQy9WWUFpdXNYYVFBQ2dHWkxiU3pVZEZUb0E0WlJlV2Y1QnhCS0M2N045dnEyK2pxcDZPdmc4RWJtdStWc0t5RHNuQS9IaEJWNlhTWUJ6ZE5NbkJCUzR5QlR3YnV6QW9TOW9ZWHl2UExzR1hwS3RDU2EvQVRsUWRzc0JlQmI4UXpyRll5OUJJSlllY2VPODF6dlZpT3NuaitKS0RJQktZcUlPTG1qVHZVQk0zQ0lQWkFoczVQRXo2Zmc5QmxKUi8rcktrWmxFVkF2NDRsbmpsVjZSRm5NSERzZHdtQ2lMNkx3RHVXS21jMmQxOW5jdVJtYnAxS1UxaklubUJKU0VRYVpjWGxpSzUrRFVKdUpmM2F5d25nUENub2ZZcHBnYlMzbjJBdGJEZ2NROHFycWorVE5RSDRvQmZZY00rOW1qNU8xZ3FGYnpHbm1Gbkd2dDZZRHhxMkE1Qi9TR2lMcVBweURYMjkrL05CODkzYmVBdW9rNzV1em5XSUZ2RDFaVzRwOCs1RGkrVzFSdXZLZml5VHphVnFuZGhPdHNaYnIxY2M4YTRlbFVmVmFLSjFpQmJ3OVdWdUtmUHVRNHZsdFVicnluNHNrODJsYXAzWVRyYkdXNjlYSEo4OENqanZXNUpNVDZHa3UwRnFrNEVhM0l6MkhBYktSMHdFZjJrYlBubzMvaUZ1cVdnNnNTSzMwUWVlakwwNmFxc0w0UXVhU2dZSS9tUVBrNzg0L2ZFK1QraWtNbGNRNG5zSGk4bVdBSWRKcTdCcnJDK1RWc2M3Rm0ycERpK25JVExCVkdJakQ0U1RSRkh6RHp3QTJEL005ZGNONzdKMVRVd0VmMmtiUG5vMzZRVzA4ZGttYTVGWjhOelZmT1BPNU03VjQwSEhFVThjbGhKSkpJeUtLcVh4cmg2VlI5Vm9vcnhOdC9oRTNaU3BGUTVPMjBuZWQxL3JpRzZ4RkRJWFNEc1diYWtPTDZjaFRrYmVVU1RoUHlPYVhwQjBXUzkvVklQcXRRV3FmSzFud3NIUUFPTEh4WThZdTYzMVJvMmRtSXhUSVpQN0cvaGJUWVpRZy9OYk82Yz0=
+      pccFileType:  secure
+      playbookName: as-generic.yml
+      serviceAddresses:
+      - name: SESM1ServiceAddr
+        ipv4: 172.29.71.50
+      - name: AM1ServiceAddr
+        ipv4: 172.29.70.71
+      - name: FPMServiceAddr
+        ipv4: 172.29.70.72
+        # ipv6: ffff:1000:1000:3122:0:0:0:1
+      sslProtocols:
+        sslV3:   true
+        tlsV1:   true
+        tlsV1_1: true
+        tlsV1_2: true
+      systemId:     1
+      users:
+        platform:
+          ## User roles:
+          ##   SSA  : Security System Administrator
+          ##   SA   : Security Auditor
+          ##   BA   : Backup Administrator
+          ##   DBA  : Database Administrator
+          ##   AA   : Application Administrator
+          ##   OSS  : OSS Administrator
+          ##   RPS  : Patching (RPS) Administrator
+          ##   PAUD : Provisioning Audit Administrator
+          ##   DIAG : System Diagnostic Administrator
+          ##   TCPD : System Packet Analysis Administrator
+          ## platformUserPassword = Default user password for platform users (reqd).
+          ##   If NO user specific password set in userlist, this value is used.
+          ## rootUserPassword     = Root user password (reqd).
+          platformUserPassword: "RAPtor1234"
+          rootUserPassword:     "RAPtor1234"
+          sudoUsers: ["ntsysadm"]
+          userlist:
+          - username: ntsysadm
+            roles: ["SSA","DIAG","TCPD"]
+           #enable: true         # To disable user, set false
+           #password:            # Opt: set password, else uses platformUserPassword 
+          - username: ntsecadm
+            roles: ["SA"]
+          - username: ntappadm
+            roles: ["AA","DIAG","TCPD"]
+          - username: ntbackup
+            roles: ["BA"]
+          - username: ntdbadm
+            roles: ["DBA"]
+          - username: ntossadm
+            roles: ["OSS"]
+          - username: nortelrps
+            roles: ["RPS"]
+          - username: ntprovadm
+            roles: ["PAUD"]
+          - username: ntdiagadm
+            roles: ["DIAG"]
+          - username: nttcpdadm
+            roles: ["TCPD"]
+        omi:
+          ## omi user/pw 'admin/admin' is created in AS load
+        - username: rafadmin
+          password: rafadmin
+          role:     secadmin
+        - username: tnquang
+          password: tnquang
+          role:     secadmin
+        - username: nntrang
+          password: nntrang
+          role:     secadmin
+        - username: nmpvinh
+          password: nmpvinh
+          role:     secadmin
+        opi:
+          ## opi user/pw 'admin/admin' is created in AS load
+        - username: rafadmin
+          password: rafadmin
+          role:     secadmin
+        - username: tnquang
+          password: tnquang
+          role:     secadmin
+        - username: nntrang
+          password: nntrang
+          role:     secadmin
+        - username: nmpvinh
+          password: nmpvinh
+          role:     secadmin
+      networkElements:
+        am:
+          managers:
+          - shortName:          AM1
+            longName:           AccountingManager1
+            basePort:           '12200'
+            fpm:                SM
+            serviceAddressName: 'AM1ServiceAddr'
+            externalNatAddress: ''
+            instances:
+            - server: EM1S1
+              config: A2_Virtualized_8GB4Core
+            - server: EM1S2
+              config: A2_Virtualized_8GB4Core
+        db:
+          managers:
+          - shortName:   asdb
+            longName:    Database
+          ##bdrUpstream: '255.29.123.1'
+          ##rootCaCert: "-----BEGIN CERTIFICATE-----\nMIIDFzCCAf+gAwIBAgIUJRg6G5Z8kFzB9esRDtySkTnL3KUwDQYJKoZIhvcNAQEL\nBQAwGzEZMBcGA1UEAxMQY3VzdG9tZXItcm9vdC1jYTAeFw0yMTA4MTkxMTMzMzVa\nFw0yMjA4MTkxMTMzMzVaMBsxGTAXBgNVBAMTEGN1c3RvbWVyLXJvb3QtY2EwggEi\nMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDLNqlsIshKvM9jPCiu0nDWfHLk\ntmRyIcyauLmXFSu0kiF6pkHY3YeZAU5PmL2+3GqlV2c1q/uBC66ZZV9sty0UweYK\nWZ8/hPKcNaK0QfIJALtg4g3yoatk7gAfAkL6bEvhVAH7mjPHhkLrRsGK5+nlpwJd\nSEP6X6+9IUN25svHRV+k6ytf33+W7D+lsXIwA5hzK6+CONuk8FocC715+oluMBJh\ntW5YAoP5A4Kp9TCZkHK++SBaab1jX7NvjivSdka4EIZgKxUN+CKhqnDtZmTslgtW\ngaGQssjzrauVTIoNOKKcVGA8GWaanS4z29GcewFsTM8IF88MTSs1GzVKCP8NAgMB\nAAGjUzBRMB0GA1UdDgQWBBQURchcfSzcJIEeixmKxKqAi9lKQzAfBgNVHSMEGDAW\ngBQURchcfSzcJIEeixmKxKqAi9lKQzAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3\nDQEBCwUAA4IBAQBLE/pw0TkIpx8T5d3CN8urQ+3APfn8fi3TWvab7amNLLuIiImF\nvzb3q83taf3vVf2jyukpo+2SxmfA/WEhXecH4yyX9P7N/h1teP9CuGPTj4auc9cx\nBVJvrfGHRRWx0mZcOiAlCJOUFimRm8mmBoofboU97AGh5+GO8gXgAUVWIAMpiOR8\nI2MAoH37LoI923Ry4veC9QCeq/GYjfPGt485a2oLXA2Xu6asqJhYSBv3Gl3kefJ4\n7lFujjaD2pTB/ORxn6fqN0tidmJeB7RlUVCFV19ZD9NhtZUqpctHdhcXAcHhZviH\nuRvYvGL60DQ77PlrEYPqmqm+NsnVwk8XX5K/\n-----END CERTIFICATE-----"
+          ##rootCaKey:  "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDLNqlsIshKvM9j\nPCiu0nDWfHLktmRyIcyauLmXFSu0kiF6pkHY3YeZAU5PmL2+3GqlV2c1q/uBC66Z\nZV9sty0UweYKWZ8/hPKcNaK0QfIJALtg4g3yoatk7gAfAkL6bEvhVAH7mjPHhkLr\nRsGK5+nlpwJdSEP6X6+9IUN25svHRV+k6ytf33+W7D+lsXIwA5hzK6+CONuk8Foc\nC715+oluMBJhtW5YAoP5A4Kp9TCZkHK++SBaab1jX7NvjivSdka4EIZgKxUN+CKh\nqnDtZmTslgtWgaGQssjzrauVTIoNOKKcVGA8GWaanS4z29GcewFsTM8IF88MTSs1\nGzVKCP8NAgMBAAECggEADmZdMxBz6PfgKkQFDf5TiJ9g9NwH2h6TBRO58v7JDg6c\n2LgXSmrIRQtWpUVJjNDJrdW3tpHtTIOrZ6tLS8TfKO1kg68+HZ4qIu+aC/PwVrr6\njC74lgzmvEwxLgFXBa/O4LS3P0D6ElVtQIbPCCzO4jsna7zHNGK7bUeCJFbOcdxU\nPa4uhv7fkQ2QxByzT3D2m4W69tD8UV2UoeGYDgMcIglksRoew/ZyQ7UXdwBC3tSm\ncEVVOITILFuD62INxecMtpzOgsHJtxP/kjHivVjTaV9Q3OVEPhUWO97zgqfi17Tg\nZUw4Fvyi0eHB51O0pcwc0tjR7a7k3HfGXrdLh0wsgQKBgQDxqTg6j1J94r6gVmPv\nzvEHtuZO5WUzZDuoxbUl/9TkEv3jEiiJJJTkuPTE5cpTMF4++wYR3TfdcyNRhU1S\n+uukeVtjpqgAQwmJKF6QeeKrX3/r43PYVJ6x48HnQXGXYvYHzHwnHkFWkWT9VgVM\nKaIYQ9nu2ymnu5ge8HBL3J8xSQKBgQDXRW7LfD4lpjlt000ZolNHgLet+lJFj1HM\nfQYArVlYVrOwKln3m6hfaDlX4+86EiANIJJlQ4i2pGa0AGo8uw0+7bNPSiSubuOm\nJFLhmJUaOrCR4IZWK3e9C6qIe8yIaCAzf4yD6OJTlzB8N7aM3N2eBma0mV7ouoMO\n/1bHG2djpQKBgBUz2aEZrg0pdbwvmDkUGQWqQG6vpb9qjely3z/kQFN6bxgbIb9W\nnFGtAJy95JCD7+DquU+b7yjYz0J5xZ0AMuiNVT1bA+Zx+0YzaoiWiRKsIFcb77AN\nTJci+oJFtaeooRlyEXqFJwpnW0r23yQdiwFCAr74L6Ftzhz4z4F4a+cxAoGBALYF\n8LxAru/40MCLlbriJdblAOssKZrFp93nrUavTUfD8CY6eV5EESezIiGuCx8oKk/P\nRdo4M4Z0Fp+HZk05wOZ/6UlXIRMZkoZuWmKFOTY3gAupNQ3xrUp9bdIAFB8XJHtH\nE5KKPa1+vrGaDlKngwDW2stEkBrrclwhDchH5LE9AoGBAORSNfsVuaRkAaN17ynr\nE304YL9wOfw+0cnjeAzts5RvSKGINKZJNi+/ISoNaPqynsD+yQ6mfheQt+sjsu+C\n1TWnVwf1osX0TVTjFeqV0+AOylr7kCKa5i1Hda3OCI+B8m0m0fv07xauUh24WYWe\naonV0kvOpPLe445tN/V4+x3m\n-----END PRIVATE KEY-----"
+          ##publicKey:  "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBOp7Lb1xucmMyP8HaBw/AipYO9R178+djiu3HtvHhUCD72ElixXlS1LkMACmegnOv9qPehAKj5dXgKv8YMbrcQs= root@1908294411f5"
+          ##privateKey: "-----BEGIN OPENSSH PRIVATE KEY-----\nb3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAaAAAABNlY2RzYS\n1zaGEyLW5pc3RwMjU2AAAACG5pc3RwMjU2AAAAQQTqey29cbnJjMj/B2gcPwIqWDvUde/P\nnY4rtx7bx4VAg+9hJYsV5UtS5DAApnoJzr/aj3oQCo+XV4Cr/GDG63ELAAAAsKjv2zyo79\ns8AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBOp7Lb1xucmMyP8H\naBw/AipYO9R178+djiu3HtvHhUCD72ElixXlS1LkMACmegnOv9qPehAKj5dXgKv8YMbrcQ\nsAAAAhAOEDzR2BCOOTITuu34Oh4df718xh84XB03qDB5DRD6veAAAAEXJvb3RAMTkwODI5\nNDQxMWY1AQIDBAUG\n-----END OPENSSH PRIVATE KEY-----"
+            instances:
+            - server: EM1S1
+              config: A2_Virtualized_8GB4Core
+            - server: EM1S2
+              config: A2_Virtualized_8GB4Core
+        fpm:
+          managers:
+          - shortName:          FPM
+            longName:           FaultManager
+            basePort:           '15000'
+            serviceAddressName: 'FPMServiceAddr'
+            externalNatAddress: ''
+            instances:
+            - server: EM1S1
+              config: A2_Virtualized_8GB4Core
+            - server: EM1S2
+              config: A2_Virtualized_8GB4Core
+        pa:
+          managers:
+          - shortName:        PA1
+            longName:         PersonalAgentManager1
+            basePort:         '27000'
+            fpm:              SM
+            sipCert:          SIPCert
+            httpsCert:        HTTPsCert
+            enableSipUdpPort: 'true'
+            enableSipTcpPort: 'true'
+            enableSipTlsPort: 'true'
+            instances:
+            - server: PA1S1
+              config: A2_Virtualized_4GB2Core
+          - shortName:        PA2
+            longName:         PersonalAgentManager2
+            basePort:         '28000'
+            fpm:              SM
+            sipCert:          SIPCert
+            httpsCert:        HTTPsCert
+            enableSipUdpPort: 'true'
+            enableSipTcpPort: 'true'
+            enableSipTlsPort: 'true'
+            instances:
+            - server: PA1S2
+              config: A2_Virtualized_4GB2Core
+        prov:
+          managers:
+          - shortName:        PROV1
+            longName:         ProvManager1
+            basePort:         '24000'
+            fpm:              SM
+            sipCert:          SIPCert
+            httpsCert:        HTTPsCert
+            enableSipUdpPort: 'true'
+            enableSipTcpPort: 'true'
+            enableSipTlsPort: 'true'
+            instances:
+            - server: EM1S1
+              config: A2_Virtualized_8GB4Core
+          - shortName:        PROV2
+            longName:         ProvManager2
+            basePort:         '24000'
+            fpm:              SM
+            sipCert:          SIPCert
+            httpsCert:        HTTPsCert
+            enableSipUdpPort: 'true'
+            enableSipTcpPort: 'true'
+            enableSipTlsPort: 'true'
+            instances:
+            - server: EM1S2
+              config: A2_Virtualized_8GB4Core
+        sesm:
+          managers:
+          - shortName:          SESM1
+            longName:           SessionManager1
+            basePort:           '22000'
+            callParkId:         '170'
+            fpm:                SM
+            am:                 'AM1'
+            sipCert:            SIPCert
+            serviceAddressName: 'SESM1ServiceAddr'
+            externalNatAddress: ''
+            enableSipUdpPort:   'true'
+            enableSipTcpPort:   'true'
+            enableSipTlsPort:   'true'
+            instances:
+            - server: SES1S1
+              config: A2_Virtualized_6GB6Core
+            - server: SES1S2
+              config: A2_Virtualized_6GB6Core 
+        sm:
+          managers:
+          - shortName:          SM
+            longName:           SystemManager
+            basePort:           '12100'
+            httpsCert:          HTTPsCert
+            internalOamAddress: '172.29.70.67'
+            instances:
+            - server: EM1S1
+              config: A2_Virtualized_8GB4Core
+            - server: EM1S2
+              config: A2_Virtualized_8GB4Core
+
+      specbook:
+        ## CMT/OPI User Accounts Data Fill
+        # callServers:
+        # - id: CS-1
+          # clli: BRHMENBS01B
+          # cmtOPIAdminName: cs1cmtadmin
+          # cmtOPIAdminPassword: cs1cmtadmin
+          # cmtClusterIpAddr: 10.10.10.1
+
+        ## Session Server Lines Call Agent Data Fill
+        # callAgents:
+        # - name: CA1
+          # logicalName: BRHMENBS01B
+          # ipAddr: 255.19.106.12
+          # qsipPort: 4980
+          # callServerId: CS-1
+          # geoMode: false
+
+        ## Session Server Lines GWC Data Fill
+        # gwcs:
+        # - id: GWC-40
+          # a2LogicalGWCId: GWC40Logical
+          # logicalName: GWC-40CS-1
+          # ipAddr: 255.19.106.13
+          # callServerId: CS-1
+          # gcpPort: 7060
+          # retransmission: false
+        # - id: GWC-0
+          # a2LogicalGWCId: GWC0Logical
+          # logicalName: GWC-0CS-1
+          # ipAddr: 255.19.106.14
+          # callServerId: CS-1
+          # gcpPort: 7060
+          # retransmission: false
+
+        ## Session Server Lines VMG Data Fill
+        # vmgs:
+        # - name: CO18staticVMG
+          # sesm: SESM1
+          # gwcId: GWC-40
+          # callServerId: CS-1
+        # - name: ple4upgradepbx
+          # sesm: SESM1
+          # gwcId: GWC-0
+          # callServerId: CS-1
+        # - name: ple4cvm17ror
+          # sesm: SESM1
+          # gwcId: GWC-40
+          # callServerId: CS-1
+
+        ## External/Service Nodes Data Fill
+        # nodes:
+        # - name: BCM4NODE
+          # ipAddr: 255.19.106.15
+        # - name: STRANode11
+          # ipAddr: 255.19.106.16
+        # - name: LDAPServerNode
+          # ipAddr: 255.19.106.27
+        # - name: GatewayTest
+          # ipAddr: 255.19.106.28  
+        # - name: S_I_NODE_LOCAL
+          # ipAddr: 255.19.106.17
+        # - name: P_I_NODE_LOCAL
+          # ipAddr: 255.19.106.18
+        # - name: S_CSCF_NODE
+          # ipAddr: 255.19.106.19
+        # - name: HSS
+          # ipAddr: 255.19.106.20
+        # - name: HuaweiGW
+          # ipAddr: 255.19.106.21
+        # - name: SAPBXNode
+          # ipAddr: 255.19.106.22
+        # - name: OCF_NODE
+          # ipAddr: 255.19.106.23
+        # - name: OCF_NODE1
+          # ipAddr: 255.19.106.29
+        # - name: CDF_NODE
+          # ipAddr: 255.19.106.24
+
+        ## External SIP Proxies Data Fill
+        # sipProxies:
+        # - shortName: K5001
+          # longName: K5001LongName
+          # externalNodeName: BCM4NODE
+          # trusted: true
+          # port: 41222
+          # transportProtocol: UDP
+          # transportProtocolPort: 5060
+          # sesm: SESM1
+
+        ## External/Service LDAP server/Informational Elements Data Fill
+        # infoElements:
+        # - shortName: STRA11
+          # longName: STRA11LongName
+          # externalNodeName: STRANode11
+          # trusted: true
+          # port: 0
+          # type: General
+          # enableUdpPort: true
+          # enableTcpPort: true
+          # enableTlsPort: true
+          # sipUdpPort: 5061
+          # sipTcpPort: 5062
+          # sipTlsPort: 5063
+          # receiveCallMode: "Proxy"
+        # - shortName: LDAP01
+          # longName: LDAP01LongName
+          # externalNodeName: LDAPServerNode
+          # trusted: true
+          # port: 389
+          # type: LDAP Server
+          # enableUdpPort: false
+          # enableTcpPort: true
+          # enableTlsPort: false
+          # sipUdpPort: 5063
+          # sipTcpPort: 5064
+          # sipTlsPort: 5065
+          # receiveCallMode: "300 Redirect"                    
+        # - shortName: GWTEST
+          # longName: GW01LongName
+          # externalNodeName: GatewayTest
+          # trusted: true
+          # port: 636
+          # type: Gateway
+          # enableUdpPort: false
+          # enableTcpPort: false
+          # enableTlsPort: true
+          # sipUdpPort: 5066
+          # sipTcpPort: 5067
+          # sipTlsPort: 5068
+          # receiveCallMode: "301 Redirect"
+        ## AYT Profile Data Fill. For OPTIONS, 400-599 are 'failures', by default.
+        # aytProfiles:
+        # - name: AytProfile1
+          # sipMessageType: INFO
+          # failMessageList:
+          # - 640
+        # - name: AytProfile2
+          # sipMessageType: INFO
+          # failMessageList:
+          # - 509
+          # - 510
+        # - name: AytProfile3
+          # sipMessageType: OPTIONS
+          # failMessageList:
+          # - 621
+          # - 623
+          # - 625
+
+        ## Session Server Lines SIP/PBX Data Fill
+        # sipPbx:
+        # - shortName: PBX1
+          # longName: PBX1LongName
+          # trusted: true
+          # trustedUser: admin
+          # trustedPassword: admin
+          # exemptDoSProtection: true
+          # aytAudit: true
+          # aytAuditPeriod: 20
+          # aytOMs: true
+          # mimeTypeSupport:
+          # - name: NSS
+          # - name: CUG
+          # - name: EPID
+          # - name: MCDN
+          # - name: ESN5
+          # aytProfile: AytProfile1
+          # sesm: SESM1
+          # sesmLong: SessionManager1
+          # routeLTID: 'RTPLTID/1'
+          # routeVMG: CO18staticVMG
+          # routeCallServer: CS-1
+          # dnsEnabled: false
+          # links:
+          # - name: Link1
+            # siteName: AsSiteRg0
+            # externalNodeName: STRANode11
+            # transmissionMode: 2
+            # remotePort: 19
+            # enableUdpPort: true
+            # enableTcpPort: false
+            # enableTlsPort: false
+            # sipUdpPort: 5069
+            # sipTcpPort: 5070
+            # sipTlsPort: 5071
+
+        ## OSS Server Data Fill
+        # ossServers:
+        # - name: OSSServer1
+          # logicalName: OSSsrv1
+          # ipAddr: 255.19.106.25
+        # - name: OSSServer2
+          # logicalName: OSSsrv2
+          # ipAddr: 255.19.106.26
+
+        ## OSS Endpoint Data Fill
+        # ossEndpoints:
+        # - name: OSSEndpoint1
+          # ossServer: OSSServer1
+          # port: 22
+        # - name: OSSEndpoint2
+          # ossServer: OSSServer2
+          # port: 21
+
+        ## FTP Push Destination Data Fill
+        # ftpPushProfiles:
+        # - name: FTPPushRule
+          # ossEndpoint: OSSEndpoint1
+          # rootDir: '/'
+          # userID: ftpUser
+          # password: ftpPassword
+          # replicate: false
+
+        ## SFTP Push Destination Data Fill
+        # sftpPushProfiles:
+        # - name: SFTPPushRule
+          # ossEndpoint: OSSEndpoint2
+          # rootDir: '/tmp/sftpPushIW'
+          # userID: ftpUser
+          # password: ftpPassword
+          # replicate: true
+          # publicKey: 'AAAAB3NzaC1yc2EAAAABIwAAAQEAwWYD7FMsq8pu7okJHWv1FwVGJTcACUznk0JqTjSkh2XI3b59RTQ131SILGMHuHC86iuGi8JfIDkxVomQSV6uirtJbHL3y9OuWjIIV1whW6D8hBY8aYB375hNyr1rY+i/Aj5XfGr10MRSUHRWKq9+ysJkNqRaTgLRsfhA+uM/nfk2/IhPOPzfK59JAXo6uNpDi8fOPs4Mz4wBfCL5xgRAZittC576FFubfZrwLYwZWkaHvR3zADP5Fb4agnGGtzU9o+N4446ifNXm8aI2ybAl32nef0K7TT6c19ASkCC3hPm2fyeAr+WjuOBYv+jefgTZpeeC1E4KjDBHFBVM40Ea1Q=='
+
+        ## SNMPv3 USM Definitions Data Fill
+        # snmpUsers:
+        # - name: user1
+          # authProtocol: MD5
+          # authPassword: abcd1234
+          # privacyProtocol: DES
+          # privacyPassword: abcd1234
+        # - name: user2
+          # authProtocol: SHA
+          # authPassword: abcd1234RAPtor1234
+          # privacyProtocol: NONE
+          # privacyPassword: abcd1234RAPtor1234
+        # - name: user3
+          # authProtocol: NONE
+          # authPassword: abcd1234RAPtor12345
+          # privacyProtocol: NONE
+          # privacyPassword: abcd1234RAPtor12345
+        ## SNMP Managers Data Fill
+        # snmpManagers:
+        # - name: SNMPManager1
+          # server: OSSServer1
+          # trapPort: 162
+          # mibSet: NORTEL_NMI
+          # version: SNMPV2C
+          # community: public
+        # - name: SNMPManager2
+          # server: OSSServer2
+          # trapPort: 162
+          # mibSet: RFC3877
+          # version: SNMPV3
+          # trapUser: user1
+
+        ## SNMP Managers Alarm Data Fill
+        # snmpAlarms:
+        # - manager: SNMPManager1
+          # localTrapInterface: 'OAM Internal Service Address'
+        # - manager: SNMPManager2
+          # localTrapInterface: 'OAM Internal Server Address'
+        ## Log Storage Rule Data Fill
+        ## MCP load auto-adds: smLogStorageRule MCP all 99 true 60 true 7 false false
+        # logStorageRules:
+        # - name: SMLogStorageRule1
+          # fpm: SM
+          # format: STD
+          # logFilter: all
+          # rotationSize: 98
+          # rotationSizeEnabled: true
+          # rotationPeriod: 60
+          # rotationPeriodEnabled: true
+          # retentionPeriod: 7
+          # secure: true
+          # compression: true
+        # - name: SMLogStorageRule2
+          # fpm: SM
+          # format: SCC2
+          # logFilter: nonSecurity
+          # rotationSize: 6
+          # rotationSizeEnabled: true
+          # rotationPeriod: 60
+          # rotationPeriodEnabled: true
+          # retentionPeriod: 6
+          # secure: false
+          # compression: false 
+        ## Log SNMP Push Rule Data Fill
+        # logSnmpRules:
+        # - name: LogSNMPPushRule1
+          # fpm: SM
+          # logFilter: all
+          # manager: SNMPManager1
+        # - name: LogSNMPPushRule2
+          # fpm: SM
+          # logFilter: alarm
+          # manager: SNMPManager2 
+        ## NorthBound Log Server Feed Rule Data Fill
+        # logNBServerFeedRules:
+        # - name: LogSvrFeedRule1
+          # fpm: SM
+          # logFormat: STD
+          # logFilter: security
+          # localPort: 12199
+          # aclValidation: false
+          # ossServer: OSSServer1
+        # - name: LogSvrFeedRule2
+          # fpm: SM
+          # logFormat: STD
+          # logFilter: alarm
+          # localPort: 65533
+          # aclValidation: true
+          # ossServer: OSSServer2
+
+        ## Log FTP Push Rule Data Fill
+        # logFtpRules:
+        # - name: logFTPPushRule
+          # fpm: SM
+          # logStorageRule: SMLogStorageRule1
+          # ftpDestination: FTPPushRule
+
+        ## OM Storage Rule Data Fill
+        ## MCP load auto-adds:
+        ##   Name               OM Type (filter)
+        ##   ------------------ -------
+        ##   smOtpOMStorageRule OTP
+        ##   smTrfOMStorageRule TRAFFIC
+        ## "Added" here, WITH SAME DATA, so "enumDataRef" works. Name used in omFtpRules.
+        # omStorageRules:
+          # - name: OMStorageRule1
+            # fpm: SM
+            # type: OTP
+            # rotationSize: 99
+            # rotationSizeEnabled: false
+            # rotationPeriod: 60
+            # rotationPeriodEnabled: false
+            # otpEnabled: true
+            # otpCount: 1
+            # retentionPeriod: 7
+            # compression: false
+          # - name: OMStorageRule2
+            # fpm: SM
+            # type: TRAFFIC
+            # rotationSize: 88
+            # rotationSizeEnabled: true
+            # rotationPeriod: 1440
+            # rotationPeriodEnabled: true
+            # otpEnabled: true
+            # otpCount: 1
+            # retentionPeriod: 7
+            # compression: true 
+        ## OM NorthBound Server Feed Rule Data Fill
+        # omNBServerFeedRules:
+        # - name: TrafficomStorageRule1
+          # fpm: SM
+          # type: OTP
+          # localPort: 12399
+          # aclValidation: false
+          # ossServer: OSSServer1
+        # - name: TrafficomStorageRule2
+          # fpm: SM
+          # type: TRAFFIC
+          # localPort: 12499
+          # aclValidation: true
+          # ossServer: OSSServer2 
+        ## OM FTP Push Rule Data Fill
+        ## Using MCP load, auto-added omStorageRule: smOtpOMStorageRule
+        # omFtpRules:
+        # - name: omFTPPushRule1
+          # fpm: SM
+          # omStorageRule: OMStorageRule1
+          # ftpDestination: FTPPushRule
+        # - name: omFTPPushRule2
+          # fpm: SM
+          # omStorageRule: OMStorageRule2
+          # ftpDestination: FTPPushRule
+        ## OM SFTP Push Rule Data Fill
+        ## Using MCP load, auto-added omStorageRule: smOtpOMStorageRule
+        # omSftpRules:
+        # - name: omSFTPPushRule
+          # fpm: SM
+          # omStorageRule: OMStorageRule1
+          # sftpDestination: SFTPPushRule
+        # - name: omSFTPPushRule2
+          # fpm: SM
+          # omStorageRule: OMStorageRule2
+          # sftpDestination: SFTPPushRule 
+        ## Accounting Storage Rule Data Fill
+        acctStorageRules:
+        - name: AcctStorageRule1
+          am: AM1
+          format: MCPV4
+          rotationSize: 99
+          rotationSizeEnabled: true
+          rotationPeriod: 60
+          rotationPeriodEnabled: true
+          retentionSize: 150
+          retentionPeriod: 7
+          retentionSizeEnabled: true
+          compression: false
+        - name: AcctStorageRule2
+          am: AM1
+          format: MCPV3
+          rotationSize: 98
+          rotationSizeEnabled: true
+          rotationPeriod: 60
+          rotationPeriodEnabled: true
+          retentionSize: 101
+          retentionPeriod: 6
+          retentionSizeEnabled: true
+          compression: true
+        ## Accounting NorthBound Server Feed Rule Data Fill
+        # acctNBServerFeedRules:
+        # - name: nbAcctStorageRule1
+          # am: AM1
+          # format: MCPV4
+          # localPort: 12199
+          # aclValidation: false
+          # ossServer: OSSServer1
+        # - name: nbAcctStorageRule2
+          # am: AM1
+          # format: MCPV3
+          # localPort: 12349
+          # aclValidation: true
+          # ossServer: OSSServer2 
+        ## Accounting FTP Push Rule Data Fill
+        # acctFtpRules:
+        # - name: FTPAcct1
+          # am: AM1
+          # acctStorageRule: AcctStorageRule1
+          # ftpDestination: FTPPushRule
+        # - name: FTPAcct2
+          # am: AM1
+          # acctStorageRule: AcctStorageRule2
+          # ftpDestination: FTPPushRule  
+        ## Accounting SFTP Push Rule Data Fill
+        # acctSftpRules:
+        # - name: SFTPAcct1
+          # am: AM1
+          # acctStorageRule: AcctStorageRule1
+          # sftpDestination: SFTPPushRule
+        # - name: SFTPAcct2
+          # am: AM1
+          # acctStorageRule: AcctStorageRule2
+          # sftpDestination: SFTPPushRule 
+        ## CAA Profile Configuration Data Fill
+        ## Radius host must be defined if central CAA config is defined for MCP/PROV GUI.
+        ## For feature to work, radius host must be configured for SM server(s).
+        ## Paths:
+        ##   spec.vnfs.*.systemConfig.caaRadiusProfiles
+        ##   spec.vnfs.*.rgs.vnfcs.*.caaProfileName
+        caaProfile:
+          authenticationType: RADIUS
+          authenticationMode: LOCAL_CENTRAL
+          authorizationMode: CENTRAL
+          cacheExpiryTime: 7
+          cacheExpiryUnit: Seconds
+
+        ## S3 General Settings Data Fill
+        # saSipPbx:
+        # - shortName: SAPBX1
+          # longName: SAPBX1LongName
+          # trusted: true
+          # trustedUser: admin
+          # trustedPassword: admin
+          # exemptDoSProtection: true
+          # aytAudit: true
+          # aytAuditPeriod: 20
+          # aytOMs: true
+          # aytProfile: AytProfile1
+          # sesm: SESM1
+          # dnsEnabled: false
+          # links:
+          # - name: Link1
+            # siteName: AsSiteRg0
+            # transmissionMode: 2
+            # externalNodeName: SAPBXNode
+            # remotePort: 19
+            # enableUdpPort: true
+            # enableTcpPort: false
+            # enableTlsPort: false
+            # sipUdpPort: 5072
+            # sipTcpPort: 5073
+            # sipTlsPort: 5074
+          # - name: Link2
+            # siteName: AsSiteRg0
+            # transmissionMode: 1
+            # externalNodeName: SAPBXNode
+            # remotePort: 100
+            # enableUdpPort: false
+            # enableTcpPort: true
+            # enableTlsPort: false
+            # sipUdpPort: 5075
+            # sipTcpPort: 5076
+            # sipTlsPort: 5077 
+        # - shortName: SAPBX2
+          # longName: SAPBX2LongName
+          # trusted: true
+          # trustedUser: admin
+          # trustedPassword: admin
+          # exemptDoSProtection: true
+          # aytAudit: true
+          # aytAuditPeriod: 21
+          # aytOMs: true
+          # aytProfile: AytProfile3
+          # sesm: SESM1
+          # dnsEnabled: false
+          # links:
+          # - name: Link3
+            # siteName: AsSiteRg0
+            # transmissionMode: 2
+            # externalNodeName: SAPBXNode
+            # remotePort: 1000
+            # enableUdpPort: true
+            # enableTcpPort: false
+            # enableTlsPort: true
+            # sipUdpPort: 5078
+            # sipTcpPort: 5079
+            # sipTlsPort: 5080
+          # - name: Link4
+            # siteName: AsSiteRg0
+            # transmissionMode: Receive
+            # externalNodeName: SAPBXNode
+            # remotePort: 500
+            # enableUdpPort: true
+            # enableTcpPort: true
+            # enableTlsPort: true
+            # sipUdpPort: 5081
+            # sipTcpPort: 5082
+            # sipTlsPort: 5083
+        # ## QoS Data Fill
+        # qos:
+          # OAM Data Fill
+          # oam:
+            # name: oamp
+            # networkSignalingDSCP: 48
+            # lowLatencyDSCP: 18
+            # highThroughputDSCP: 16
+          # Call Signaling Data Fill
+          # callsignaling:
+            # name: callsignaling
+            # sipUnistimDSCP: 48
+
+        ## IMS: I-CSCF Data Fill
+        # iCscf:
+        # - shortName: "ISLOC"
+          # longName: "ISLOCLongName"
+          # trusted: true
+          # exemptDoSProtection: true
+          # default: false
+          # supportUserPrivacy: false
+          # userName: "tnquang"
+          # externalNodeName: "S_I_NODE_LOCAL"
+          # identificationPort: 5084
+          # sipProfile: "Unidentified" 
+          # timeout: 30
+          # enableUdpPort: true
+          # enableTcpPort: false
+          # enableTlsPort: false
+          # sipUdpPort: 5085
+          # sipTcpPort: 5086
+          # sipTlsPort: 5087
+        # - shortName: "IPLOC"
+          # longName: "IPLOCLongName"
+          # trusted: true
+          # exemptDoSProtection: true
+          # default: false
+          # supportUserPrivacy: false
+          # userName: "tnquang1"
+          # externalNodeName: "P_I_NODE_LOCAL"
+          # identificationPort: 5091
+          # sipProfile: "Unidentified" 
+          # timeout: 5
+          # enableUdpPort: true
+          # enableTcpPort: false
+          # enableTlsPort: false
+          # sipUdpPort: 5088
+          # sipTcpPort: 5089
+          # sipTlsPort: 5090
+
+        ## IMS: S-CSCF Data Fill
+        # sCscf:
+        # - shortName: "SCSCF"
+          # longName: "SCSCFLongName"
+          # trusted: true
+          # exemptDoSProtection: true
+          # supportUserPrivacy: false
+          # externalNodeName: "S_CSCF_NODE"
+          # identificationPort: 5091
+          # sipProfile: "Unidentified"
+          # enableUdpPort: true
+          # enableTcpPort: false
+          # enableTlsPort: false
+          # sipUdpPort: 5092
+          # sipTcpPort: 5093
+          # sipTlsPort: 5094
+
+        ## IMS: HSS Data Fill
+        # hss:
+        # - shortName: "HSS"
+          # longName: "HSSLongName"
+          # primaryNode: "HSS"
+          # secondaryNode: "HuaweiGW"
+          # realmName: "ribbon.com"
+          # hostName: "hss.ribbon.com"
+          # port: 3868
+          # ## "TCP": Database Error: The value for field transportType was not found in the database. "tcp" was in GUI
+          # transportType: tcp
+          # connectTimeout: 100000
+          # queueSizeLimit: 150000
+          # reconnectTimeout: 200000
+          # sendMessageTimeout: 250000
+          # stateMachineTimeout: 30000
+          # watchDogTimeout: 350000
+
+        ## Add Session Managers Authorized Methods
+        # authorizedMethods:
+        # - operation: "add"
+          # sesm: "SESM1"
+          # methods:
+          # - "INFO"
+          # - "INVITE"
+          # - "MESSAGE"
+          # - "BYE"
+          # - "REGISTER"
+          # - "SERVICE"
+          # - "NOTIFY"         
+        ## GenBand Media Server
+        # gms:
+        # - shortName: GMS120
+          # longName: GenbandMS120
+          # siteName: AsSiteRg0
+          # oamAddr:
+            # name: GMS120_OAM
+            # ipv4Address: 255.29.123.216 
+          # mediaAddr:
+            # name: GMS120_MEDIA
+            # ipv4Address: 255.29.123.217 
+          # controlAddr:
+            # name: GMS120_CALL
+            # ipv4Address: 255.29.123.218 
+          # pollingInterval: 60
+          # snmpProfileName: Default
+          # fpm: SM
+          # enableUdpPort: true
+          # enableTcpPort: false
+          # enableTlsPort: false
+          # sipUdpPort: 5160
+          # sipTcpPort: 5161
+          # sipTlsPort: 5162
+
+        ## Online Charging: OCF Group Data Fill
+        # ocfGroup:
+        # - name:                ocfGr1
+          # stateMachineTimeout: 333
+          # slowResponseTimeout: 100
+          # sendMessageTimeout:  10
+          # diameterWatchdogTimeout: 7
+          # reconnectTimeout:    3
+          # connectTimeout:      1
+          # outboundQueueSize: 1024
+          # vendorType:        "3GPP"
+        # - name:                ocfGr2
+          # stateMachineTimeout: 666
+          # slowResponseTimeout: 500
+          # sendMessageTimeout:  2
+          # diameterWatchdogTimeout: 30
+          # reconnectTimeout:    30
+          # connectTimeout:      15
+          # outboundQueueSize: 2048
+          # vendorType:        "3GPP"        
+        # - name:                ocfGr3
+          # stateMachineTimeout: 998
+          # slowResponseTimeout: 10
+          # sendMessageTimeout:  700
+          # diameterWatchdogTimeout: 800
+          # reconnectTimeout:    900
+          # connectTimeout:      600
+          # outboundQueueSize: 4896
+          # vendorType:        "Version1" 
+        ## Online Charging: OCF Data Fill
+        # ocfData:
+        # - shortName:     ocfDat
+          # longName:      ocfDataLong
+          # hostName:      ocfHost
+          # port:          1818
+          # realmName:     admin
+          # transportType: tcp
+          # server:        OCF_NODE
+          # ocfGroupName:  ocfGr1
+          # sesm:          SESM1
+          # sesmLong:      SessionManager1
+        # - shortName:     ocfDa2
+          # longName:      ocfDataLong2
+          # hostName:      ocfHost2
+          # port:          4896
+          # realmName:     admin2
+          # transportType: tcp
+          # server:        OCF_NODE1
+          # ocfGroupName:  ocfGr2
+          # sesm:          SESM1
+          # sesmLong:      SessionManager1 
+        ## Offline Charging: CDF Group Data Fill
+        # cdfGroup:
+        # - name:                cdfGrp
+          # stateMachineTimeout: 2
+          # slowResponseTimeout: 998
+          # sendMessageTimeout:  500
+          # diameterWatchdogTimeout: 30
+          # reconnectTimeout:    600
+          # connectTimeout:      150
+          # outboundQueueSize: 2048
+
+        ## Offline Charging: CDF Data Fill
+        # cdfData:
+        # - shortName:     cdfDat
+          # longName:      cdfDataLong
+          # hostName:      cdfHost
+          # port:          1818
+          # realmName:     admin
+          # transportType: tcp
+          # server:        CDF_NODE
+          # cdfGroupName:  cdfGrp
+          # sesm:          SESM1
+          # sesmLong:      SessionManager1
+
+    rgs:
+    - name:               ASTL5HOST3
+     #managed:            true
+      providerType:       kvm
+      providerAccessName: kvm_provider_access_ASTL53
+      ## image can be specified in: vnfs, rgs, vnfcs. Most specific is used.
+      image:              'MCP-22.0.0.0.4444.qcow2'
+      site:
+        name:     AsSiteRg0
+        easting:  58458
+        northing: 10334
+        zone:     F15
+     #systemConfig:   # Can be fully or partially re-defined per RG. Most specific field is used.
+      vnfcs:
+        
+      - name:                    EM1S1
+       ## name, longName, hostName must be unique
+       ## image can be specified in: vnfs, rgs, vnfcs. Most specific is used.
+       #image:
+        hostName:                em1s1
+        longName:                EM1Server1
+        vnfcType:                'as'
+        flavorName:              EM_4Core_8Ram_200
+        backupProfileName:       sampleBkupConfASTL53     # systemConfig.backupProfiles.*, or empty
+       #banner:
+       #  ## If no 'banner:' object, default Linux banner used
+       #  name: as-banner.txt
+       #  data: xxx                                 # base64 --wrap=0 as-banner.txt, paste data: xxx
+        caaProfileName:          default            # systemConfig.caaRadiusProfiles.* 
+        dscpMarkingProfileName:  default            # systemConfig.dscpMarkingProfiles.*
+       #firewalldConfig:                            # If iptables rules needed for VM
+       #- table:        filter
+       #  chain:        INPUT
+       #  priority:     0
+       #  other_params: -d 255.19.107.64 -p tcp -m tcp --dport 22 -j REJECT --reject-with icmp-port-unreachable
+        fpm:                     SM                 # {sm|fpm}.managers.*.shortName
+        # ipsec:
+          # ipsecProfileName:      sampleIpsecProfile # systemConfig.ipsecProfiles.* 
+          # ipsecConfFile:         externalConfFile   # systemConfig.ipsecConfFiles.*
+          # serverIPs:
+          # - 255.19.107.64
+          # - 255.19.106.64
+          # targetIPs:
+          # - 1.1.1.1
+        scheduleBkupProfileName: scheduleBkupConfASTL53   # systemConfig.scheduleBkupProfiles.*, or empty
+        snmpProfileName:         ribbonsec          # systemConfig.snmpProfiles.*.name
+        networkInfo:
+          isPhysicalNetworkSeparation: false
+         #arpIpAddresses:
+         #- ipv4Address: "1.1.1.1"
+          ## If isPhysicalNetworkSeparation false, 1 networkInterfaces req'd
+          ## If isPhysicalNetworkSeparation true,  2 networkInterfaces req'd
+          networkInterfaces:
+          - networkName:   kvm_oam_network_ASTL53
+            subnetName:    OAM
+           #logicalName:   asVm1-logical-Rg0-Nic0 
+            ipv4Address:   172.29.70.68
+            macAddress:   00:00:00:00:00:00
+           #ipv6Address:   "2001:db8::1234"
+           ## For SRIOV, pciBuses req'd
+            # pciBuses:
+            # - pciBusId: "0000:01:10.0"
+              # macAddress:  00:00:00:00:00:00
+            # - pciBusId: "0000:01:10.1"
+              # macAddress:  00:00:00:00:00:00
+         #- networkName:   kvm_private_network
+         #  subnetName:    SIGNALING
+         # #logicalName:   asVm1-logical-Rg0-Nic1
+         #  ipv4Address:   255.19.107.64
+         # #macAddress:    00:00:00:00:00:00
+         #mcpStaticRoute:
+         #- destinationIP: 255.29.111.151
+         #  prefix:        32
+         #  gatewayIP:     255.29.111.1
+         #  interfaceName: eth0
+         #mtcNetworkInterface:
+         #  networkName:   kvm_oam_network
+         #  subnetName:    MANAGEMENT
+         # #logicalName:   asVm1-logical-Rg0-Mtc
+         #  ipv4Address:   255.19.106.103
+      - name:                    SES1S1
+       ## name, longName, hostName must be unique
+       ## image can be specified in: vnfs, rgs, vnfcs. Most specific is used.
+       #image:
+        hostName:                sesm1s1
+        longName:                SESM1Server1
+        vnfcType:                'as'
+        flavorName:              SESM_6Core_6Ram_40
+        backupProfileName:       sampleBkupConfASTL53     # systemConfig.backupProfiles.*, or empty
+       #banner:
+       #  ## If no 'banner:' object, default Linux banner used
+       #  name: as-banner.txt
+       #  data: xxx                                 # base64 --wrap=0 as-banner.txt, paste data: xxx
+        caaProfileName:          default            # systemConfig.caaRadiusProfiles.* 
+        dscpMarkingProfileName:  default            # systemConfig.dscpMarkingProfiles.*
+       #firewalldConfig:                            # If iptables rules needed for VM
+       #- table:        filter
+       #  chain:        INPUT
+       #  priority:     0
+       #  other_params: -d 255.19.107.64 -p tcp -m tcp --dport 22 -j REJECT --reject-with icmp-port-unreachable
+        fpm:                     SM                 # {sm|fpm}.managers.*.shortName
+        # ipsec:
+          # ipsecProfileName:      sampleIpsecProfile # systemConfig.ipsecProfiles.* 
+          # ipsecConfFile:         externalConfFile   # systemConfig.ipsecConfFiles.*
+          # serverIPs:
+          # - 255.19.107.64
+          # - 255.19.106.64
+          # targetIPs:
+          # - 1.1.1.1
+        scheduleBkupProfileName: scheduleBkupConfASTL53   # systemConfig.scheduleBkupProfiles.*, or empty
+        snmpProfileName:         ribbonsec          # systemConfig.snmpProfiles.*.name
+        networkInfo:
+          isPhysicalNetworkSeparation: false
+         #arpIpAddresses:
+         #- ipv4Address: "1.1.1.1"
+          ## If isPhysicalNetworkSeparation false, 1 networkInterfaces req'd
+          ## If isPhysicalNetworkSeparation true,  2 networkInterfaces req'd
+          networkInterfaces:
+          #- networkName:   kvm_oam_network_ASTL5-3
+          #  subnetName:    OAMP
+          # # logicalName:   asVm1-logical-Rg0-Nic0 
+          #  ipv4Address:   172.29.70.68
+          # # ipv6Address:   "2001:db8::1234"
+          # For SRIOV, pciBuses req'd
+          #  pciBuses:
+          #  - pciBusId: "0000:00:00.0"
+          #    macAddress:  00:00:00:00:00:00
+          #  - pciBusId: "0000:00:00.0"
+          #    macAddress:  00:00:00:00:00:00
+          - networkName:   kvm_private_network_ASTL53
+            subnetName:    SIG
+           #logicalName:   asVm1-logical-Rg0-Nic1
+            ipv4Address:   172.29.71.27
+            macAddress:   00:00:00:00:00:00
+            # pciBuses:
+            # - pciBusId: "0000:81:10.0"
+              # macAddress:  00:00:00:00:00:00
+            # - pciBusId: "0000:83:10.0"
+              # macAddress:  00:00:00:00:00:00
+         #mcpStaticRoute:
+         #- destinationIP: 255.29.111.151
+         #  prefix:        32
+         #  gatewayIP:     255.29.111.1
+         #  interfaceName: eth0
+         #mtcNetworkInterface:
+         #  networkName:   kvm_oam_network
+         #  subnetName:    MANAGEMENT
+         # #logicalName:   asVm1-logical-Rg0-Mtc
+         #  ipv4Address:   255.19.106.103
+      - name:                    PA1S1
+       ## name, longName, hostName must be unique
+       ## image can be specified in: vnfs, rgs, vnfcs. Most specific is used.
+       #image:
+        hostName:                pa1s1
+        longName:                PA1Server1
+        vnfcType:                'as'
+        flavorName:              PA_2Core_4Ram_60
+        backupProfileName:       sampleBkupConfASTL53     # systemConfig.backupProfiles.*, or empty
+       #banner:
+       #  ## If no 'banner:' object, default Linux banner used
+       #  name: as-banner.txt
+       #  data: xxx                                 # base64 --wrap=0 as-banner.txt, paste data: xxx
+        caaProfileName:          default            # systemConfig.caaRadiusProfiles.* 
+        dscpMarkingProfileName:  default            # systemConfig.dscpMarkingProfiles.*
+       #firewalldConfig:                            # If iptables rules needed for VM
+       #- table:        filter
+       #  chain:        INPUT
+       #  priority:     0
+       #  other_params: -d 255.19.107.64 -p tcp -m tcp --dport 22 -j REJECT --reject-with icmp-port-unreachable
+        fpm:                     SM                 # {sm|fpm}.managers.*.shortName
+        # ipsec:
+          # ipsecProfileName:      sampleIpsecProfile # systemConfig.ipsecProfiles.* 
+          # ipsecConfFile:         externalConfFile   # systemConfig.ipsecConfFiles.*
+          # serverIPs:
+          # - 255.19.107.64
+          # - 255.19.106.64
+          # targetIPs:
+          # - 1.1.1.1
+        scheduleBkupProfileName: scheduleBkupConfASTL53   # systemConfig.scheduleBkupProfiles.*, or empty
+        snmpProfileName:         ribbonsec          # systemConfig.snmpProfiles.*.name
+        networkInfo:
+          isPhysicalNetworkSeparation: false
+         #arpIpAddresses:
+         #- ipv4Address: "1.1.1.1"
+          ## If isPhysicalNetworkSeparation false, 1 networkInterfaces req'd
+          ## If isPhysicalNetworkSeparation true,  2 networkInterfaces req'd
+          networkInterfaces:
+          #- networkName:   kvm_oam_network_ASTL5-3
+          #  subnetName:    OAMP
+          # #logicalName:   asVm1-logical-Rg0-Nic0 
+          #  ipv4Address:   172.29.70.68
+          # #ipv6Address:   "2001:db8::1234"
+          # ## For SRIOV, pciBuses req'd
+          #  pciBuses:
+          #  - pciBusId: "0000:00:00.0"
+          #    macAddress:  00:00:00:00:00:00
+          #  - pciBusId: "0000:00:00.0"
+          #    macAddress:  00:00:00:00:00:00
+          - networkName:   kvm_private_network_ASTL53
+            subnetName:    SIG
+           #logicalName:   asVm1-logical-Rg0-Nic1
+            ipv4Address:   172.29.71.31
+            macAddress:   00:00:00:00:00:00
+            # pciBuses:
+            # - pciBusId: "0000:81:10.4"
+              # macAddress:  00:00:00:00:00:00
+            # - pciBusId: "0000:83:10.4"
+              # macAddress:  00:00:00:00:00:00
+         #mcpStaticRoute:
+         #- destinationIP: 255.29.111.151
+         #  prefix:        32
+         #  gatewayIP:     255.29.111.1
+         #  interfaceName: eth0
+         #mtcNetworkInterface:
+         #  networkName:   kvm_oam_network
+         #  subnetName:    MANAGEMENT
+         # #logicalName:   asVm1-logical-Rg0-Mtc
+         #  ipv4Address:   255.19.106.103
+    - name:               ASTL5HOST4
+     #managed:            true
+      providerType:       kvm
+      providerAccessName: kvm_provider_access_ASTL54
+      ## image can be specified in: vnfs, rgs, vnfcs. Most specific is used.
+      image:              'MCP-22.0.0.0.4415.qcow2'
+      site:
+        name:     AsSiteRg0
+        easting:  58458
+        northing: 10334
+        zone:     F15
+     #systemConfig:   # Can be fully or partially re-defined per RG. Most specific field is used.
+      vnfcs:
+        
+      - name:                    EM1S2
+       ## name, longName, hostName must be unique
+       ## image can be specified in: vnfs, rgs, vnfcs. Most specific is used.
+       #image:
+        hostName:                em1s2
+        longName:                EM1Server2
+        vnfcType:                'as'
+        flavorName:              EM_4Core_8Ram_200
+        backupProfileName:       sampleBkupConfASTL54     # systemConfig.backupProfiles.*, or empty
+       #banner:
+       #  ## If no 'banner:' object, default Linux banner used
+       #  name: as-banner.txt
+       #  data: xxx                                 # base64 --wrap=0 as-banner.txt, paste data: xxx
+        caaProfileName:          default            # systemConfig.caaRadiusProfiles.* 
+        dscpMarkingProfileName:  default            # systemConfig.dscpMarkingProfiles.*
+       #firewalldConfig:                            # If iptables rules needed for VM
+       #- table:        filter
+       #  chain:        INPUT
+       #  priority:     0
+       #  other_params: -d 255.19.107.64 -p tcp -m tcp --dport 22 -j REJECT --reject-with icmp-port-unreachable
+        fpm:                     SM                 # {sm|fpm}.managers.*.shortName
+        # ipsec:
+          # ipsecProfileName:      sampleIpsecProfile # systemConfig.ipsecProfiles.* 
+          # ipsecConfFile:         externalConfFile   # systemConfig.ipsecConfFiles.*
+          # serverIPs:
+          # - 255.19.107.64
+          # - 255.19.106.64
+          # targetIPs:
+          # - 1.1.1.1
+        scheduleBkupProfileName: scheduleBkupConfASTL54   # systemConfig.scheduleBkupProfiles.*, or empty
+        snmpProfileName:         ribbonsec          # systemConfig.snmpProfiles.*.name
+        networkInfo:
+          isPhysicalNetworkSeparation: false
+         #arpIpAddresses:
+         #- ipv4Address: "1.1.1.1"
+          ## If isPhysicalNetworkSeparation false, 1 networkInterfaces req'd
+          ## If isPhysicalNetworkSeparation true,  2 networkInterfaces req'd
+          networkInterfaces:
+          - networkName:   kvm_oam_network_ASTL54
+            subnetName:    OAM
+           #logicalName:   asVm1-logical-Rg0-Nic0 
+            ipv4Address:   172.29.70.69
+            macAddress:   00:00:00:00:00:00
+           #ipv6Address:   "2001:db8::1234"
+           ## For SRIOV, pciBuses req'd
+            # pciBuses:
+            # - pciBusId: "0000:01:10.0"
+              # macAddress:  00:00:00:00:00:00
+            # - pciBusId: "0000:01:10.1"
+              # macAddress:  00:00:00:00:00:00
+         #- networkName:   kvm_private_network
+         #  subnetName:    SIGNALING
+         # #logicalName:   asVm1-logical-Rg0-Nic1
+         #  ipv4Address:   255.19.107.64
+         # #macAddress:    00:00:00:00:00:00
+         #mcpStaticRoute:
+         #- destinationIP: 255.29.111.151
+         #  prefix:        32
+         #  gatewayIP:     255.29.111.1
+         #  interfaceName: eth0
+         #mtcNetworkInterface:
+         #  networkName:   kvm_oam_network
+         #  subnetName:    MANAGEMENT
+         # #logicalName:   asVm1-logical-Rg0-Mtc
+         #  ipv4Address:   255.19.106.103
+      - name:                    SES1S2
+       ## name, longName, hostName must be unique
+       ## image can be specified in: vnfs, rgs, vnfcs. Most specific is used.
+       #image:
+        hostName:                sesm1s2
+        longName:                SESM1Server2
+        vnfcType:                'as'
+        flavorName:              SESM_6Core_6Ram_40
+        backupProfileName:       sampleBkupConfASTL54     # systemConfig.backupProfiles.*, or empty
+       #banner:
+       #  ## If no 'banner:' object, default Linux banner used
+       #  name: as-banner.txt
+       #  data: xxx                                 # base64 --wrap=0 as-banner.txt, paste data: xxx
+        caaProfileName:          default            # systemConfig.caaRadiusProfiles.* 
+        dscpMarkingProfileName:  default            # systemConfig.dscpMarkingProfiles.*
+       #firewalldConfig:                            # If iptables rules needed for VM
+       #- table:        filter
+       #  chain:        INPUT
+       #  priority:     0
+       #  other_params: -d 255.19.107.64 -p tcp -m tcp --dport 22 -j REJECT --reject-with icmp-port-unreachable
+        fpm:                     SM                 # {sm|fpm}.managers.*.shortName
+        # ipsec:
+          # ipsecProfileName:      sampleIpsecProfile # systemConfig.ipsecProfiles.* 
+          # ipsecConfFile:         externalConfFile   # systemConfig.ipsecConfFiles.*
+          # serverIPs:
+          # - 255.19.107.64
+          # - 255.19.106.64
+          # targetIPs:
+          # - 1.1.1.1
+        scheduleBkupProfileName: scheduleBkupConfASTL54   # systemConfig.scheduleBkupProfiles.*, or empty
+        snmpProfileName:         ribbonsec          # systemConfig.snmpProfiles.*.name
+        networkInfo:
+          isPhysicalNetworkSeparation: false
+         #arpIpAddresses:
+         #- ipv4Address: "1.1.1.1"
+          ## If isPhysicalNetworkSeparation false, 1 networkInterfaces req'd
+          ## If isPhysicalNetworkSeparation true,  2 networkInterfaces req'd
+          networkInterfaces:
+          #- networkName:   kvm_oam_network_ASTL5-3
+          #  subnetName:    OAMP
+          # # logicalName:   asVm1-logical-Rg0-Nic0 
+          #  ipv4Address:   172.29.70.68
+          # # ipv6Address:   "2001:db8::1234"
+          # For SRIOV, pciBuses req'd
+          #  pciBuses:
+          #  - pciBusId: "0000:00:00.0"
+          #    macAddress:  00:00:00:00:00:00
+          #  - pciBusId: "0000:00:00.0"
+          #    macAddress:  00:00:00:00:00:00
+          - networkName:   kvm_private_network_ASTL54
+            subnetName:    SIG
+           #logicalName:   asVm1-logical-Rg0-Nic1
+            ipv4Address:   172.29.71.28
+            macAddress:   00:00:00:00:00:00
+            # pciBuses:
+            # - pciBusId: "0000:81:10.0"
+              # macAddress:  00:00:00:00:00:00
+            # - pciBusId: "0000:83:10.0"
+              # macAddress:  00:00:00:00:00:00
+         #mcpStaticRoute:
+         #- destinationIP: 255.29.111.151
+         #  prefix:        32
+         #  gatewayIP:     255.29.111.1
+         #  interfaceName: eth0
+         #mtcNetworkInterface:
+         #  networkName:   kvm_oam_network
+         #  subnetName:    MANAGEMENT
+         # #logicalName:   asVm1-logical-Rg0-Mtc
+         #  ipv4Address:   255.19.106.103
+      - name:                    PA1S2
+       ## name, longName, hostName must be unique
+       ## image can be specified in: vnfs, rgs, vnfcs. Most specific is used.
+       #image:
+        hostName:                pa1s2
+        longName:                PA1Server2
+        vnfcType:                'as'
+        flavorName:              PA_2Core_4Ram_60
+        backupProfileName:       sampleBkupConfASTL54     # systemConfig.backupProfiles.*, or empty
+       #banner:
+       #  ## If no 'banner:' object, default Linux banner used
+       #  name: as-banner.txt
+       #  data: xxx                                 # base64 --wrap=0 as-banner.txt, paste data: xxx
+        caaProfileName:          default            # systemConfig.caaRadiusProfiles.* 
+        dscpMarkingProfileName:  default            # systemConfig.dscpMarkingProfiles.*
+       #firewalldConfig:                            # If iptables rules needed for VM
+       #- table:        filter
+       #  chain:        INPUT
+       #  priority:     0
+       #  other_params: -d 255.19.107.64 -p tcp -m tcp --dport 22 -j REJECT --reject-with icmp-port-unreachable
+        fpm:                     SM                 # {sm|fpm}.managers.*.shortName
+        # ipsec:
+          # ipsecProfileName:      sampleIpsecProfile # systemConfig.ipsecProfiles.* 
+          # ipsecConfFile:         externalConfFile   # systemConfig.ipsecConfFiles.*
+          # serverIPs:
+          # - 255.19.107.64
+          # - 255.19.106.64
+          # targetIPs:
+          # - 1.1.1.1
+        scheduleBkupProfileName: scheduleBkupConfASTL54   # systemConfig.scheduleBkupProfiles.*, or empty
+        snmpProfileName:         ribbonsec          # systemConfig.snmpProfiles.*.name
+        networkInfo:
+          isPhysicalNetworkSeparation: false
+         #arpIpAddresses:
+         #- ipv4Address: "1.1.1.1"
+          ## If isPhysicalNetworkSeparation false, 1 networkInterfaces req'd
+          ## If isPhysicalNetworkSeparation true,  2 networkInterfaces req'd
+          networkInterfaces:
+          #- networkName:   kvm_oam_network_ASTL5-3
+          #  subnetName:    OAMP
+          # #logicalName:   asVm1-logical-Rg0-Nic0 
+          #  ipv4Address:   172.29.70.68
+          # #ipv6Address:   "2001:db8::1234"
+          # ## For SRIOV, pciBuses req'd
+          #  pciBuses:
+          #  - pciBusId: "0000:00:00.0"
+          #    macAddress:  00:00:00:00:00:00
+          #  - pciBusId: "0000:00:00.0"
+          #    macAddress:  00:00:00:00:00:00
+          - networkName:   kvm_private_network_ASTL54
+            subnetName:    SIG
+           #logicalName:   asVm1-logical-Rg0-Nic1
+            ipv4Address:   172.29.71.32
+            macAddress:   00:00:00:00:00:00
+            # pciBuses:
+            # - pciBusId: "0000:81:10.4"
+              # macAddress:  00:00:00:00:00:00
+            # - pciBusId: "0000:83:10.4"
+              # macAddress:  00:00:00:00:00:00
+         #mcpStaticRoute:
+         #- destinationIP: 255.29.111.151
+         #  prefix:        32
+         #  gatewayIP:     255.29.111.1
+         #  interfaceName: eth0
+         #mtcNetworkInterface:
+         #  networkName:   kvm_oam_network
+         #  subnetName:    MANAGEMENT
+         # #logicalName:   asVm1-logical-Rg0-Mtc
+         #  ipv4Address:   255.19.106.103         
