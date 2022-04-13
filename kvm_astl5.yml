@@ -216,7 +216,6 @@ spec:
         writeString: ribbonrwq       
 
     appConfig:
-      vnfrFilename: vnfr-22.03-release_as_15.0-b274.tar.gz
       certificates:
         p12FileCerts:
         - name:     SIPCert
@@ -265,10 +264,12 @@ spec:
       serviceAddresses:
       - name: SESM1ServiceAddr
         ipv4: 172.29.71.50
+      - name: SESM2ServiceAddr
+        ipv4: 172.29.71.51
       - name: AM1ServiceAddr
         ipv4: 172.29.70.71
-      - name: FPMServiceAddr
-        ipv4: 172.29.70.72
+      # - name: FPMServiceAddr
+        # ipv4: 172.29.70.72
         # ipv6: ffff:1000:1000:3122:0:0:0:1
       sslProtocols:
         sslV3:   true
@@ -357,9 +358,9 @@ spec:
             externalNatAddress: ''
             instances:
             - server: EM1S1
-              config: A2_Virtualized_8GB4Core
+              config: A2_Virtualized_16GB8Core_DB_Small
             - server: EM1S2
-              config: A2_Virtualized_8GB4Core
+              config: A2_Virtualized_16GB8Core_DB_Small
         db:
           managers:
           - shortName:   asdb
@@ -370,22 +371,22 @@ spec:
           ##publicKey:  "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBOp7Lb1xucmMyP8HaBw/AipYO9R178+djiu3HtvHhUCD72ElixXlS1LkMACmegnOv9qPehAKj5dXgKv8YMbrcQs= root@1908294411f5"
           ##privateKey: "-----BEGIN OPENSSH PRIVATE KEY-----\nb3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAaAAAABNlY2RzYS\n1zaGEyLW5pc3RwMjU2AAAACG5pc3RwMjU2AAAAQQTqey29cbnJjMj/B2gcPwIqWDvUde/P\nnY4rtx7bx4VAg+9hJYsV5UtS5DAApnoJzr/aj3oQCo+XV4Cr/GDG63ELAAAAsKjv2zyo79\ns8AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBOp7Lb1xucmMyP8H\naBw/AipYO9R178+djiu3HtvHhUCD72ElixXlS1LkMACmegnOv9qPehAKj5dXgKv8YMbrcQ\nsAAAAhAOEDzR2BCOOTITuu34Oh4df718xh84XB03qDB5DRD6veAAAAEXJvb3RAMTkwODI5\nNDQxMWY1AQIDBAUG\n-----END OPENSSH PRIVATE KEY-----"
             instances:
-            - server: EM1S1
-              config: A2_Virtualized_8GB4Core
-            - server: EM1S2
-              config: A2_Virtualized_8GB4Core
-        fpm:
-          managers:
-          - shortName:          FPM
-            longName:           FaultManager
-            basePort:           '15000'
-            serviceAddressName: 'FPMServiceAddr'
-            externalNatAddress: ''
-            instances:
-            - server: EM1S1
-              config: A2_Virtualized_8GB4Core
-            - server: EM1S2
-              config: A2_Virtualized_8GB4Core
+            - server: DB1S1
+              config: A2_Virtualized_16GB8Core_DB_Small
+            - server: DB1S2
+              config: A2_Virtualized_16GB8Core_DB_Small
+        # fpm:
+          # managers:
+          # - shortName:          FPM
+            # longName:           FaultManager
+            # basePort:           '15000'
+            # serviceAddressName: 'FPMServiceAddr'
+            # externalNatAddress: ''
+            # instances:
+            # - server: EM1S1
+              # config: A2_Virtualized_16GB8Core_DB_Small
+            # - server: EM1S2
+              # config: A2_Virtualized_16GB8Core_DB_Small
         pa:
           managers:
           - shortName:        PA1
@@ -425,7 +426,7 @@ spec:
             enableSipTlsPort: 'true'
             instances:
             - server: EM1S1
-              config: A2_Virtualized_8GB4Core
+              config: A2_Virtualized_16GB8Core_DB_Small
           - shortName:        PROV2
             longName:         ProvManager2
             basePort:         '24000'
@@ -437,12 +438,12 @@ spec:
             enableSipTlsPort: 'true'
             instances:
             - server: EM1S2
-              config: A2_Virtualized_8GB4Core
+              config: A2_Virtualized_16GB8Core_DB_Small
         sesm:
           managers:
           - shortName:          SESM1
             longName:           SessionManager1
-            basePort:           '22000'
+            basePort:           '21000'
             callParkId:         '170'
             fpm:                SM
             am:                 'AM1'
@@ -457,6 +458,24 @@ spec:
               config: A2_Virtualized_6GB6Core
             - server: SES1S2
               config: A2_Virtualized_6GB6Core 
+          - shortName:          SESM2
+            longName:           SessionManager2
+            basePort:           '22000'
+            callParkId:         '171'
+            fpm:                SM
+            am:                 'AM1'
+            sipCert:            SIPCert
+            serviceAddressName: 'SESM2ServiceAddr'
+            externalNatAddress: ''
+            enableSipUdpPort:   'true'
+            enableSipTcpPort:   'true'
+            enableSipTlsPort:   'true'
+            instances:
+            - server: SES2S1
+              config: A2_Virtualized_6GB6Core
+            - server: SES2S2
+              config: A2_Virtualized_6GB6Core 
+
         sm:
           managers:
           - shortName:          SM
@@ -466,329 +485,329 @@ spec:
             internalOamAddress: '172.29.70.67'
             instances:
             - server: EM1S1
-              config: A2_Virtualized_8GB4Core
+              config: A2_Virtualized_16GB8Core_DB_Small
             - server: EM1S2
-              config: A2_Virtualized_8GB4Core
+              config: A2_Virtualized_16GB8Core_DB_Small
 
       specbook:
         ## CMT/OPI User Accounts Data Fill
-        # callServers:
-        # - id: CS-1
-          # clli: BRHMENBS01B
-          # cmtOPIAdminName: cs1cmtadmin
-          # cmtOPIAdminPassword: cs1cmtadmin
-          # cmtClusterIpAddr: 10.10.10.1
+        callServers:
+        - id: CS-1
+          clli: BRHMENBS01B
+          cmtOPIAdminName: cs1cmtadmin
+          cmtOPIAdminPassword: cs1cmtadmin
+          cmtClusterIpAddr: 10.10.10.1
 
         ## Session Server Lines Call Agent Data Fill
-        # callAgents:
-        # - name: CA1
-          # logicalName: BRHMENBS01B
-          # ipAddr: 255.19.106.12
-          # qsipPort: 4980
-          # callServerId: CS-1
-          # geoMode: false
+        callAgents:
+        - name: CA1
+          logicalName: BRHMENBS01B
+          ipAddr: 255.19.106.12
+          qsipPort: 4980
+          callServerId: CS-1
+          geoMode: false
 
         ## Session Server Lines GWC Data Fill
-        # gwcs:
-        # - id: GWC-40
-          # a2LogicalGWCId: GWC40Logical
-          # logicalName: GWC-40CS-1
-          # ipAddr: 255.19.106.13
-          # callServerId: CS-1
-          # gcpPort: 7060
-          # retransmission: false
-        # - id: GWC-0
-          # a2LogicalGWCId: GWC0Logical
-          # logicalName: GWC-0CS-1
-          # ipAddr: 255.19.106.14
-          # callServerId: CS-1
-          # gcpPort: 7060
-          # retransmission: false
+        gwcs:
+        - id: GWC-40
+          a2LogicalGWCId: GWC40Logical
+          logicalName: GWC-40CS-1
+          ipAddr: 255.19.106.13
+          callServerId: CS-1
+          gcpPort: 7060
+          retransmission: false
+        - id: GWC-0
+          a2LogicalGWCId: GWC0Logical
+          logicalName: GWC-0CS-1
+          ipAddr: 255.19.106.14
+          callServerId: CS-1
+          gcpPort: 7060
+          retransmission: false
 
         ## Session Server Lines VMG Data Fill
-        # vmgs:
-        # - name: CO18staticVMG
-          # sesm: SESM1
-          # gwcId: GWC-40
-          # callServerId: CS-1
-        # - name: ple4upgradepbx
-          # sesm: SESM1
-          # gwcId: GWC-0
-          # callServerId: CS-1
-        # - name: ple4cvm17ror
-          # sesm: SESM1
-          # gwcId: GWC-40
-          # callServerId: CS-1
+        vmgs:
+        - name: CO18staticVMG
+          sesm: SESM1
+          gwcId: GWC-40
+          callServerId: CS-1
+        - name: ple4upgradepbx
+          sesm: SESM1
+          gwcId: GWC-0
+          callServerId: CS-1
+        - name: ple4cvm17ror
+          sesm: SESM1
+          gwcId: GWC-40
+          callServerId: CS-1
 
         ## External/Service Nodes Data Fill
-        # nodes:
-        # - name: BCM4NODE
-          # ipAddr: 255.19.106.15
-        # - name: STRANode11
-          # ipAddr: 255.19.106.16
-        # - name: LDAPServerNode
-          # ipAddr: 255.19.106.27
-        # - name: GatewayTest
-          # ipAddr: 255.19.106.28  
-        # - name: S_I_NODE_LOCAL
-          # ipAddr: 255.19.106.17
-        # - name: P_I_NODE_LOCAL
-          # ipAddr: 255.19.106.18
-        # - name: S_CSCF_NODE
-          # ipAddr: 255.19.106.19
-        # - name: HSS
-          # ipAddr: 255.19.106.20
-        # - name: HuaweiGW
-          # ipAddr: 255.19.106.21
-        # - name: SAPBXNode
-          # ipAddr: 255.19.106.22
-        # - name: OCF_NODE
-          # ipAddr: 255.19.106.23
-        # - name: OCF_NODE1
-          # ipAddr: 255.19.106.29
-        # - name: CDF_NODE
-          # ipAddr: 255.19.106.24
+        nodes:
+        - name: BCM4NODE
+          ipAddr: 255.19.106.15
+        - name: STRANode11
+          ipAddr: 255.19.106.16
+        - name: LDAPServerNode
+          ipAddr: 255.19.106.27
+        - name: GatewayTest
+          ipAddr: 255.19.106.28  
+        - name: S_I_NODE_LOCAL
+          ipAddr: 255.19.106.17
+        - name: P_I_NODE_LOCAL
+          ipAddr: 255.19.106.18
+        - name: S_CSCF_NODE
+          ipAddr: 255.19.106.19
+        - name: HSS
+          ipAddr: 255.19.106.20
+        - name: HuaweiGW
+          ipAddr: 255.19.106.21
+        - name: SAPBXNode
+          ipAddr: 255.19.106.22
+        - name: OCF_NODE
+          ipAddr: 255.19.106.23
+        - name: OCF_NODE1
+          ipAddr: 255.19.106.29
+        - name: CDF_NODE
+          ipAddr: 255.19.106.24
 
         ## External SIP Proxies Data Fill
-        # sipProxies:
-        # - shortName: K5001
-          # longName: K5001LongName
-          # externalNodeName: BCM4NODE
-          # trusted: true
-          # port: 41222
-          # transportProtocol: UDP
-          # transportProtocolPort: 5060
-          # sesm: SESM1
+        sipProxies:
+        - shortName: K5001
+          longName: K5001LongName
+          externalNodeName: BCM4NODE
+          trusted: true
+          port: 41222
+          transportProtocol: UDP
+          transportProtocolPort: 5060
+          sesm: SESM1
 
         ## External/Service LDAP server/Informational Elements Data Fill
-        # infoElements:
-        # - shortName: STRA11
-          # longName: STRA11LongName
-          # externalNodeName: STRANode11
-          # trusted: true
-          # port: 0
-          # type: General
-          # enableUdpPort: true
-          # enableTcpPort: true
-          # enableTlsPort: true
-          # sipUdpPort: 5061
-          # sipTcpPort: 5062
-          # sipTlsPort: 5063
-          # receiveCallMode: "Proxy"
-        # - shortName: LDAP01
-          # longName: LDAP01LongName
-          # externalNodeName: LDAPServerNode
-          # trusted: true
-          # port: 389
-          # type: LDAP Server
-          # enableUdpPort: false
-          # enableTcpPort: true
-          # enableTlsPort: false
-          # sipUdpPort: 5063
-          # sipTcpPort: 5064
-          # sipTlsPort: 5065
-          # receiveCallMode: "300 Redirect"                    
-        # - shortName: GWTEST
-          # longName: GW01LongName
-          # externalNodeName: GatewayTest
-          # trusted: true
-          # port: 636
-          # type: Gateway
-          # enableUdpPort: false
-          # enableTcpPort: false
-          # enableTlsPort: true
-          # sipUdpPort: 5066
-          # sipTcpPort: 5067
-          # sipTlsPort: 5068
-          # receiveCallMode: "301 Redirect"
+        infoElements:
+        - shortName: STRA11
+          longName: STRA11LongName
+          externalNodeName: STRANode11
+          trusted: true
+          port: 0
+          type: General
+          enableUdpPort: true
+          enableTcpPort: true
+          enableTlsPort: true
+          sipUdpPort: 5061
+          sipTcpPort: 5062
+          sipTlsPort: 5063
+          receiveCallMode: "Proxy"
+        - shortName: LDAP01
+          longName: LDAP01LongName
+          externalNodeName: LDAPServerNode
+          trusted: true
+          port: 389
+          type: LDAP Server
+          enableUdpPort: false
+          enableTcpPort: true
+          enableTlsPort: false
+          sipUdpPort: 5063
+          sipTcpPort: 5064
+          sipTlsPort: 5065
+          receiveCallMode: "300 Redirect"                    
+        - shortName: GWTEST
+          longName: GW01LongName
+          externalNodeName: GatewayTest
+          trusted: true
+          port: 636
+          type: Gateway
+          enableUdpPort: false
+          enableTcpPort: false
+          enableTlsPort: true
+          sipUdpPort: 5066
+          sipTcpPort: 5067
+          sipTlsPort: 5068
+          receiveCallMode: "301 Redirect"
         ## AYT Profile Data Fill. For OPTIONS, 400-599 are 'failures', by default.
-        # aytProfiles:
-        # - name: AytProfile1
-          # sipMessageType: INFO
-          # failMessageList:
-          # - 640
+        aytProfiles:
+        - name: AytProfile1
+          sipMessageType: INFO
+          failMessageList:
+          - 640
         # - name: AytProfile2
           # sipMessageType: INFO
           # failMessageList:
           # - 509
           # - 510
-        # - name: AytProfile3
-          # sipMessageType: OPTIONS
-          # failMessageList:
-          # - 621
-          # - 623
-          # - 625
+        - name: AytProfile3
+          sipMessageType: OPTIONS
+          failMessageList:
+          - 621
+          - 623
+          - 625
 
         ## Session Server Lines SIP/PBX Data Fill
-        # sipPbx:
-        # - shortName: PBX1
-          # longName: PBX1LongName
-          # trusted: true
-          # trustedUser: admin
-          # trustedPassword: admin
-          # exemptDoSProtection: true
-          # aytAudit: true
-          # aytAuditPeriod: 20
-          # aytOMs: true
-          # mimeTypeSupport:
-          # - name: NSS
-          # - name: CUG
-          # - name: EPID
-          # - name: MCDN
-          # - name: ESN5
-          # aytProfile: AytProfile1
-          # sesm: SESM1
-          # sesmLong: SessionManager1
-          # routeLTID: 'RTPLTID/1'
-          # routeVMG: CO18staticVMG
-          # routeCallServer: CS-1
-          # dnsEnabled: false
-          # links:
-          # - name: Link1
-            # siteName: AsSiteRg0
-            # externalNodeName: STRANode11
-            # transmissionMode: 2
-            # remotePort: 19
-            # enableUdpPort: true
-            # enableTcpPort: false
-            # enableTlsPort: false
-            # sipUdpPort: 5069
-            # sipTcpPort: 5070
-            # sipTlsPort: 5071
+        sipPbx:
+        - shortName: PBX1
+          longName: PBX1LongName
+          trusted: true
+          trustedUser: admin
+          trustedPassword: admin
+          exemptDoSProtection: true
+          aytAudit: true
+          aytAuditPeriod: 20
+          aytOMs: true
+          mimeTypeSupport:
+          - name: NSS
+          - name: CUG
+          - name: EPID
+          - name: MCDN
+          - name: ESN5
+          aytProfile: AytProfile1
+          sesm: SESM1
+          sesmLong: SessionManager1
+          routeLTID: 'RTPLTID/1'
+          routeVMG: CO18staticVMG
+          routeCallServer: CS-1
+          dnsEnabled: false
+          links:
+          - name: Link1
+            siteName: AsSiteRg0
+            externalNodeName: STRANode11
+            transmissionMode: 1
+            remotePort: 19
+            enableUdpPort: true
+            enableTcpPort: false
+            enableTlsPort: false
+            sipUdpPort: 5069
+            sipTcpPort: 5070
+            sipTlsPort: 5071
 
         ## OSS Server Data Fill
-        # ossServers:
-        # - name: OSSServer1
-          # logicalName: OSSsrv1
-          # ipAddr: 255.19.106.25
-        # - name: OSSServer2
-          # logicalName: OSSsrv2
-          # ipAddr: 255.19.106.26
+        ossServers:
+        - name: OSSServer1
+          logicalName: OSSsrv1
+          ipAddr: 255.19.106.25
+        - name: OSSServer2
+          logicalName: OSSsrv2
+          ipAddr: 255.19.106.26
 
         ## OSS Endpoint Data Fill
-        # ossEndpoints:
-        # - name: OSSEndpoint1
-          # ossServer: OSSServer1
-          # port: 22
-        # - name: OSSEndpoint2
-          # ossServer: OSSServer2
-          # port: 21
+        ossEndpoints:
+        - name: OSSEndpoint1
+          ossServer: OSSServer1
+          port: 22
+        - name: OSSEndpoint2
+          ossServer: OSSServer2
+          port: 21
 
         ## FTP Push Destination Data Fill
-        # ftpPushProfiles:
-        # - name: FTPPushRule
-          # ossEndpoint: OSSEndpoint1
-          # rootDir: '/'
-          # userID: ftpUser
-          # password: ftpPassword
-          # replicate: false
+        ftpPushProfiles:
+        - name: FTPPushRule
+          ossEndpoint: OSSEndpoint1
+          rootDir: '/'
+          userID: ftpUser
+          password: ftpPassword
+          replicate: false
 
         ## SFTP Push Destination Data Fill
-        # sftpPushProfiles:
-        # - name: SFTPPushRule
-          # ossEndpoint: OSSEndpoint2
-          # rootDir: '/tmp/sftpPushIW'
-          # userID: ftpUser
-          # password: ftpPassword
-          # replicate: true
-          # publicKey: 'AAAAB3NzaC1yc2EAAAABIwAAAQEAwWYD7FMsq8pu7okJHWv1FwVGJTcACUznk0JqTjSkh2XI3b59RTQ131SILGMHuHC86iuGi8JfIDkxVomQSV6uirtJbHL3y9OuWjIIV1whW6D8hBY8aYB375hNyr1rY+i/Aj5XfGr10MRSUHRWKq9+ysJkNqRaTgLRsfhA+uM/nfk2/IhPOPzfK59JAXo6uNpDi8fOPs4Mz4wBfCL5xgRAZittC576FFubfZrwLYwZWkaHvR3zADP5Fb4agnGGtzU9o+N4446ifNXm8aI2ybAl32nef0K7TT6c19ASkCC3hPm2fyeAr+WjuOBYv+jefgTZpeeC1E4KjDBHFBVM40Ea1Q=='
+        sftpPushProfiles:
+        - name: SFTPPushRule
+          ossEndpoint: OSSEndpoint2
+          rootDir: '/tmp/sftpPushIW'
+          userID: ftpUser
+          password: ftpPassword
+          replicate: true
+          publicKey: 'AAAAB3NzaC1yc2EAAAABIwAAAQEAwWYD7FMsq8pu7okJHWv1FwVGJTcACUznk0JqTjSkh2XI3b59RTQ131SILGMHuHC86iuGi8JfIDkxVomQSV6uirtJbHL3y9OuWjIIV1whW6D8hBY8aYB375hNyr1rY+i/Aj5XfGr10MRSUHRWKq9+ysJkNqRaTgLRsfhA+uM/nfk2/IhPOPzfK59JAXo6uNpDi8fOPs4Mz4wBfCL5xgRAZittC576FFubfZrwLYwZWkaHvR3zADP5Fb4agnGGtzU9o+N4446ifNXm8aI2ybAl32nef0K7TT6c19ASkCC3hPm2fyeAr+WjuOBYv+jefgTZpeeC1E4KjDBHFBVM40Ea1Q=='
 
         ## SNMPv3 USM Definitions Data Fill
-        # snmpUsers:
-        # - name: user1
-          # authProtocol: MD5
-          # authPassword: abcd1234
-          # privacyProtocol: DES
-          # privacyPassword: abcd1234
-        # - name: user2
-          # authProtocol: SHA
-          # authPassword: abcd1234RAPtor1234
-          # privacyProtocol: NONE
-          # privacyPassword: abcd1234RAPtor1234
-        # - name: user3
-          # authProtocol: NONE
-          # authPassword: abcd1234RAPtor12345
-          # privacyProtocol: NONE
-          # privacyPassword: abcd1234RAPtor12345
+        snmpUsers:
+        - name: user1
+          authProtocol: MD5
+          authPassword: abcd1234
+          privacyProtocol: DES
+          privacyPassword: abcd1234
+        - name: user2
+          authProtocol: SHA
+          authPassword: abcd1234RAPtor1234
+          privacyProtocol: NONE
+          privacyPassword: abcd1234RAPtor1234
+        - name: user3
+          authProtocol: NONE
+          authPassword: abcd1234RAPtor12345
+          privacyProtocol: NONE
+          privacyPassword: abcd1234RAPtor12345
         ## SNMP Managers Data Fill
-        # snmpManagers:
-        # - name: SNMPManager1
-          # server: OSSServer1
-          # trapPort: 162
-          # mibSet: NORTEL_NMI
-          # version: SNMPV2C
-          # community: public
-        # - name: SNMPManager2
-          # server: OSSServer2
-          # trapPort: 162
-          # mibSet: RFC3877
-          # version: SNMPV3
-          # trapUser: user1
+        snmpManagers:
+        - name: SNMPManager1
+          server: OSSServer1
+          trapPort: 162
+          mibSet: NORTEL_NMI
+          version: SNMPV2C
+          community: public
+        - name: SNMPManager2
+          server: OSSServer2
+          trapPort: 162
+          mibSet: RFC3877
+          version: SNMPV3
+          trapUser: user1
 
         ## SNMP Managers Alarm Data Fill
-        # snmpAlarms:
-        # - manager: SNMPManager1
-          # localTrapInterface: 'OAM Internal Service Address'
-        # - manager: SNMPManager2
-          # localTrapInterface: 'OAM Internal Server Address'
+        snmpAlarms:
+        - manager: SNMPManager1
+          localTrapInterface: 'OAM Internal Service Address'
+        - manager: SNMPManager2
+          localTrapInterface: 'OAM Internal Server Address'
         ## Log Storage Rule Data Fill
         ## MCP load auto-adds: smLogStorageRule MCP all 99 true 60 true 7 false false
-        # logStorageRules:
-        # - name: SMLogStorageRule1
-          # fpm: SM
-          # format: STD
-          # logFilter: all
-          # rotationSize: 98
-          # rotationSizeEnabled: true
-          # rotationPeriod: 60
-          # rotationPeriodEnabled: true
-          # retentionPeriod: 7
-          # secure: true
-          # compression: true
-        # - name: SMLogStorageRule2
-          # fpm: SM
-          # format: SCC2
-          # logFilter: nonSecurity
-          # rotationSize: 6
-          # rotationSizeEnabled: true
-          # rotationPeriod: 60
-          # rotationPeriodEnabled: true
-          # retentionPeriod: 6
-          # secure: false
-          # compression: false 
+        logStorageRules:
+        - name: SMLogStorageRule1
+          fpm: SM
+          format: STD
+          logFilter: all
+          rotationSize: 98
+          rotationSizeEnabled: true
+          rotationPeriod: 60
+          rotationPeriodEnabled: true
+          retentionPeriod: 7
+          secure: true
+          compression: true
+        - name: SMLogStorageRule2
+          fpm: SM
+          format: SCC2
+          logFilter: nonSecurity
+          rotationSize: 6
+          rotationSizeEnabled: true
+          rotationPeriod: 60
+          rotationPeriodEnabled: true
+          retentionPeriod: 6
+          secure: false
+          compression: false 
         ## Log SNMP Push Rule Data Fill
-        # logSnmpRules:
-        # - name: LogSNMPPushRule1
-          # fpm: SM
-          # logFilter: all
-          # manager: SNMPManager1
-        # - name: LogSNMPPushRule2
-          # fpm: SM
-          # logFilter: alarm
-          # manager: SNMPManager2 
+        logSnmpRules:
+        - name: LogSNMPPushRule1
+          fpm: SM
+          logFilter: all
+          manager: SNMPManager1
+        - name: LogSNMPPushRule2
+          fpm: SM
+          logFilter: alarm
+          manager: SNMPManager2 
         ## NorthBound Log Server Feed Rule Data Fill
-        # logNBServerFeedRules:
-        # - name: LogSvrFeedRule1
-          # fpm: SM
-          # logFormat: STD
-          # logFilter: security
-          # localPort: 12199
-          # aclValidation: false
-          # ossServer: OSSServer1
-        # - name: LogSvrFeedRule2
-          # fpm: SM
-          # logFormat: STD
-          # logFilter: alarm
-          # localPort: 65533
-          # aclValidation: true
-          # ossServer: OSSServer2
+        logNBServerFeedRules:
+        - name: LogSvrFeedRule1
+          fpm: SM
+          logFormat: STD
+          logFilter: security
+          localPort: 12199
+          aclValidation: false
+          ossServer: OSSServer1
+        - name: LogSvrFeedRule2
+          fpm: SM
+          logFormat: STD
+          logFilter: alarm
+          localPort: 65533
+          aclValidation: true
+          ossServer: OSSServer2
 
         ## Log FTP Push Rule Data Fill
-        # logFtpRules:
-        # - name: logFTPPushRule
-          # fpm: SM
-          # logStorageRule: SMLogStorageRule1
-          # ftpDestination: FTPPushRule
+        logFtpRules:
+        - name: logFTPPushRule
+          fpm: SM
+          logStorageRule: SMLogStorageRule1
+          ftpDestination: FTPPushRule
 
         ## OM Storage Rule Data Fill
         ## MCP load auto-adds:
@@ -797,65 +816,65 @@ spec:
         ##   smOtpOMStorageRule OTP
         ##   smTrfOMStorageRule TRAFFIC
         ## "Added" here, WITH SAME DATA, so "enumDataRef" works. Name used in omFtpRules.
-        # omStorageRules:
-          # - name: OMStorageRule1
-            # fpm: SM
-            # type: OTP
-            # rotationSize: 99
-            # rotationSizeEnabled: false
-            # rotationPeriod: 60
-            # rotationPeriodEnabled: false
-            # otpEnabled: true
-            # otpCount: 1
-            # retentionPeriod: 7
-            # compression: false
-          # - name: OMStorageRule2
-            # fpm: SM
-            # type: TRAFFIC
-            # rotationSize: 88
-            # rotationSizeEnabled: true
-            # rotationPeriod: 1440
-            # rotationPeriodEnabled: true
-            # otpEnabled: true
-            # otpCount: 1
-            # retentionPeriod: 7
-            # compression: true 
+        omStorageRules:
+          - name: OMStorageRule1
+            fpm: SM
+            type: OTP
+            rotationSize: 99
+            rotationSizeEnabled: false
+            rotationPeriod: 60
+            rotationPeriodEnabled: false
+            otpEnabled: true
+            otpCount: 1
+            retentionPeriod: 7
+            compression: false
+          - name: OMStorageRule2
+            fpm: SM
+            type: TRAFFIC
+            rotationSize: 88
+            rotationSizeEnabled: true
+            rotationPeriod: 1440
+            rotationPeriodEnabled: true
+            otpEnabled: true
+            otpCount: 1
+            retentionPeriod: 7
+            compression: true 
         ## OM NorthBound Server Feed Rule Data Fill
-        # omNBServerFeedRules:
-        # - name: TrafficomStorageRule1
-          # fpm: SM
-          # type: OTP
-          # localPort: 12399
-          # aclValidation: false
-          # ossServer: OSSServer1
-        # - name: TrafficomStorageRule2
-          # fpm: SM
-          # type: TRAFFIC
-          # localPort: 12499
-          # aclValidation: true
-          # ossServer: OSSServer2 
+        omNBServerFeedRules:
+        - name: TrafficomStorageRule1
+          fpm: SM
+          type: OTP
+          localPort: 12399
+          aclValidation: false
+          ossServer: OSSServer1
+        - name: TrafficomStorageRule2
+          fpm: SM
+          type: TRAFFIC
+          localPort: 12499
+          aclValidation: true
+          ossServer: OSSServer2 
         ## OM FTP Push Rule Data Fill
         ## Using MCP load, auto-added omStorageRule: smOtpOMStorageRule
-        # omFtpRules:
-        # - name: omFTPPushRule1
-          # fpm: SM
-          # omStorageRule: OMStorageRule1
-          # ftpDestination: FTPPushRule
-        # - name: omFTPPushRule2
-          # fpm: SM
-          # omStorageRule: OMStorageRule2
-          # ftpDestination: FTPPushRule
+        omFtpRules:
+        - name: omFTPPushRule1
+          fpm: SM
+          omStorageRule: OMStorageRule1
+          ftpDestination: FTPPushRule
+        - name: omFTPPushRule2
+          fpm: SM
+          omStorageRule: OMStorageRule2
+          ftpDestination: FTPPushRule
         ## OM SFTP Push Rule Data Fill
         ## Using MCP load, auto-added omStorageRule: smOtpOMStorageRule
-        # omSftpRules:
-        # - name: omSFTPPushRule
-          # fpm: SM
-          # omStorageRule: OMStorageRule1
-          # sftpDestination: SFTPPushRule
-        # - name: omSFTPPushRule2
-          # fpm: SM
-          # omStorageRule: OMStorageRule2
-          # sftpDestination: SFTPPushRule 
+        omSftpRules:
+        - name: omSFTPPushRule
+          fpm: SM
+          omStorageRule: OMStorageRule1
+          sftpDestination: SFTPPushRule
+        - name: omSFTPPushRule2
+          fpm: SM
+          omStorageRule: OMStorageRule2
+          sftpDestination: SFTPPushRule 
         ## Accounting Storage Rule Data Fill
         acctStorageRules:
         - name: AcctStorageRule1
@@ -881,39 +900,39 @@ spec:
           retentionSizeEnabled: true
           compression: true
         ## Accounting NorthBound Server Feed Rule Data Fill
-        # acctNBServerFeedRules:
-        # - name: nbAcctStorageRule1
-          # am: AM1
-          # format: MCPV4
-          # localPort: 12199
-          # aclValidation: false
-          # ossServer: OSSServer1
-        # - name: nbAcctStorageRule2
-          # am: AM1
-          # format: MCPV3
-          # localPort: 12349
-          # aclValidation: true
-          # ossServer: OSSServer2 
+        acctNBServerFeedRules:
+        - name: nbAcctStorageRule1
+          am: AM1
+          format: MCPV4
+          localPort: 12199
+          aclValidation: false
+          ossServer: OSSServer1
+        - name: nbAcctStorageRule2
+          am: AM1
+          format: MCPV3
+          localPort: 12349
+          aclValidation: true
+          ossServer: OSSServer2 
         ## Accounting FTP Push Rule Data Fill
-        # acctFtpRules:
-        # - name: FTPAcct1
-          # am: AM1
-          # acctStorageRule: AcctStorageRule1
-          # ftpDestination: FTPPushRule
-        # - name: FTPAcct2
-          # am: AM1
-          # acctStorageRule: AcctStorageRule2
-          # ftpDestination: FTPPushRule  
+        acctFtpRules:
+        - name: FTPAcct1
+          am: AM1
+          acctStorageRule: AcctStorageRule1
+          ftpDestination: FTPPushRule
+        - name: FTPAcct2
+          am: AM1
+          acctStorageRule: AcctStorageRule2
+          ftpDestination: FTPPushRule  
         ## Accounting SFTP Push Rule Data Fill
-        # acctSftpRules:
-        # - name: SFTPAcct1
-          # am: AM1
-          # acctStorageRule: AcctStorageRule1
-          # sftpDestination: SFTPPushRule
-        # - name: SFTPAcct2
-          # am: AM1
-          # acctStorageRule: AcctStorageRule2
-          # sftpDestination: SFTPPushRule 
+        acctSftpRules:
+        - name: SFTPAcct1
+          am: AM1
+          acctStorageRule: AcctStorageRule1
+          sftpDestination: SFTPPushRule
+        - name: SFTPAcct2
+          am: AM1
+          acctStorageRule: AcctStorageRule2
+          sftpDestination: SFTPPushRule 
         ## CAA Profile Configuration Data Fill
         ## Radius host must be defined if central CAA config is defined for MCP/PROV GUI.
         ## For feature to work, radius host must be configured for SM server(s).
@@ -928,42 +947,42 @@ spec:
           cacheExpiryUnit: Seconds
 
         ## S3 General Settings Data Fill
-        # saSipPbx:
-        # - shortName: SAPBX1
-          # longName: SAPBX1LongName
-          # trusted: true
-          # trustedUser: admin
-          # trustedPassword: admin
-          # exemptDoSProtection: true
-          # aytAudit: true
-          # aytAuditPeriod: 20
-          # aytOMs: true
-          # aytProfile: AytProfile1
-          # sesm: SESM1
-          # dnsEnabled: false
-          # links:
-          # - name: Link1
-            # siteName: AsSiteRg0
-            # transmissionMode: 2
-            # externalNodeName: SAPBXNode
-            # remotePort: 19
-            # enableUdpPort: true
-            # enableTcpPort: false
-            # enableTlsPort: false
-            # sipUdpPort: 5072
-            # sipTcpPort: 5073
-            # sipTlsPort: 5074
-          # - name: Link2
-            # siteName: AsSiteRg0
-            # transmissionMode: 1
-            # externalNodeName: SAPBXNode
-            # remotePort: 100
-            # enableUdpPort: false
-            # enableTcpPort: true
-            # enableTlsPort: false
-            # sipUdpPort: 5075
-            # sipTcpPort: 5076
-            # sipTlsPort: 5077 
+        saSipPbx:
+        - shortName: SAPBX1
+          longName: SAPBX1LongName
+          trusted: true
+          trustedUser: admin
+          trustedPassword: admin
+          exemptDoSProtection: true
+          aytAudit: true
+          aytAuditPeriod: 20
+          aytOMs: true
+          aytProfile: AytProfile1
+          sesm: SESM1
+          dnsEnabled: false
+          links:
+          - name: Link1
+            siteName: AsSiteRg0
+            transmissionMode: 1
+            externalNodeName: SAPBXNode
+            remotePort: 19
+            enableUdpPort: true
+            enableTcpPort: false
+            enableTlsPort: false
+            sipUdpPort: 5072
+            sipTcpPort: 5073
+            sipTlsPort: 5074
+          - name: Link2
+            siteName: AsSiteRg0
+            transmissionMode: 1
+            externalNodeName: SAPBXNode
+            remotePort: 100
+            enableUdpPort: false
+            enableTcpPort: true
+            enableTlsPort: false
+            sipUdpPort: 5075
+            sipTcpPort: 5076
+            sipTlsPort: 5077 
         # - shortName: SAPBX2
           # longName: SAPBX2LongName
           # trusted: true
@@ -979,7 +998,7 @@ spec:
           # links:
           # - name: Link3
             # siteName: AsSiteRg0
-            # transmissionMode: 2
+            # transmissionMode: 1
             # externalNodeName: SAPBXNode
             # remotePort: 1000
             # enableUdpPort: true
@@ -1000,155 +1019,155 @@ spec:
             # sipTcpPort: 5082
             # sipTlsPort: 5083
         # ## QoS Data Fill
-        # qos:
-          # OAM Data Fill
-          # oam:
-            # name: oamp
-            # networkSignalingDSCP: 48
-            # lowLatencyDSCP: 18
-            # highThroughputDSCP: 16
-          # Call Signaling Data Fill
-          # callsignaling:
-            # name: callsignaling
-            # sipUnistimDSCP: 48
+        qos:
+          ## OAM Data Fill
+          oam:
+            name: oamp
+            networkSignalingDSCP: 48
+            lowLatencyDSCP: 18
+            highThroughputDSCP: 16
+          ## Call Signaling Data Fill
+          callsignaling:
+            name: callsignaling
+            sipUnistimDSCP: 48
 
         ## IMS: I-CSCF Data Fill
-        # iCscf:
-        # - shortName: "ISLOC"
-          # longName: "ISLOCLongName"
-          # trusted: true
-          # exemptDoSProtection: true
-          # default: false
-          # supportUserPrivacy: false
-          # userName: "tnquang"
-          # externalNodeName: "S_I_NODE_LOCAL"
-          # identificationPort: 5084
-          # sipProfile: "Unidentified" 
-          # timeout: 30
-          # enableUdpPort: true
-          # enableTcpPort: false
-          # enableTlsPort: false
-          # sipUdpPort: 5085
-          # sipTcpPort: 5086
-          # sipTlsPort: 5087
-        # - shortName: "IPLOC"
-          # longName: "IPLOCLongName"
-          # trusted: true
-          # exemptDoSProtection: true
-          # default: false
-          # supportUserPrivacy: false
-          # userName: "tnquang1"
-          # externalNodeName: "P_I_NODE_LOCAL"
-          # identificationPort: 5091
-          # sipProfile: "Unidentified" 
-          # timeout: 5
-          # enableUdpPort: true
-          # enableTcpPort: false
-          # enableTlsPort: false
-          # sipUdpPort: 5088
-          # sipTcpPort: 5089
-          # sipTlsPort: 5090
+        iCscf:
+        - shortName: "ISLOC"
+          longName: "ISLOCLongName"
+          trusted: true
+          exemptDoSProtection: true
+          default: false
+          supportUserPrivacy: false
+          userName: "tnquang"
+          externalNodeName: "S_I_NODE_LOCAL"
+          identificationPort: 5084
+          sipProfile: "Unidentified" 
+          timeout: 30
+          enableUdpPort: true
+          enableTcpPort: false
+          enableTlsPort: false
+          sipUdpPort: 5085
+          sipTcpPort: 5086
+          sipTlsPort: 5087
+        - shortName: "IPLOC"
+          longName: "IPLOCLongName"
+          trusted: true
+          exemptDoSProtection: true
+          default: false
+          supportUserPrivacy: false
+          userName: "tnquang1"
+          externalNodeName: "P_I_NODE_LOCAL"
+          identificationPort: 5091
+          sipProfile: "Unidentified" 
+          timeout: 5
+          enableUdpPort: true
+          enableTcpPort: false
+          enableTlsPort: false
+          sipUdpPort: 5088
+          sipTcpPort: 5089
+          sipTlsPort: 5090
 
         ## IMS: S-CSCF Data Fill
-        # sCscf:
-        # - shortName: "SCSCF"
-          # longName: "SCSCFLongName"
-          # trusted: true
-          # exemptDoSProtection: true
-          # supportUserPrivacy: false
-          # externalNodeName: "S_CSCF_NODE"
-          # identificationPort: 5091
-          # sipProfile: "Unidentified"
-          # enableUdpPort: true
-          # enableTcpPort: false
-          # enableTlsPort: false
-          # sipUdpPort: 5092
-          # sipTcpPort: 5093
-          # sipTlsPort: 5094
+        sCscf:
+        - shortName: "SCSCF"
+          longName: "SCSCFLongName"
+          trusted: true
+          exemptDoSProtection: true
+          supportUserPrivacy: false
+          externalNodeName: "S_CSCF_NODE"
+          identificationPort: 5091
+          sipProfile: "Unidentified"
+          enableUdpPort: true
+          enableTcpPort: false
+          enableTlsPort: false
+          sipUdpPort: 5092
+          sipTcpPort: 5093
+          sipTlsPort: 5094
 
         ## IMS: HSS Data Fill
-        # hss:
-        # - shortName: "HSS"
-          # longName: "HSSLongName"
-          # primaryNode: "HSS"
-          # secondaryNode: "HuaweiGW"
-          # realmName: "ribbon.com"
-          # hostName: "hss.ribbon.com"
-          # port: 3868
-          # ## "TCP": Database Error: The value for field transportType was not found in the database. "tcp" was in GUI
-          # transportType: tcp
-          # connectTimeout: 100000
-          # queueSizeLimit: 150000
-          # reconnectTimeout: 200000
-          # sendMessageTimeout: 250000
-          # stateMachineTimeout: 30000
-          # watchDogTimeout: 350000
+        hss:
+        - shortName: "HSS"
+          longName: "HSSLongName"
+          primaryNode: "HSS"
+          secondaryNode: "HuaweiGW"
+          realmName: "ribbon.com"
+          hostName: "hss.ribbon.com"
+          port: 3868
+          ## "TCP": Database Error: The value for field transportType was not found in the database. "tcp" was in GUI
+          transportType: tcp
+          connectTimeout: 100000
+          queueSizeLimit: 150000
+          reconnectTimeout: 200000
+          sendMessageTimeout: 250000
+          stateMachineTimeout: 30000
+          watchDogTimeout: 350000
 
         ## Add Session Managers Authorized Methods
-        # authorizedMethods:
-        # - operation: "add"
-          # sesm: "SESM1"
-          # methods:
-          # - "INFO"
-          # - "INVITE"
-          # - "MESSAGE"
-          # - "BYE"
-          # - "REGISTER"
-          # - "SERVICE"
-          # - "NOTIFY"         
+        authorizedMethods:
+        - operation: "add"
+          sesm: "SESM1"
+          methods:
+          - "INFO"
+          - "INVITE"
+          - "MESSAGE"
+          - "BYE"
+          - "REGISTER"
+          - "SERVICE"
+          - "NOTIFY"         
         ## GenBand Media Server
-        # gms:
-        # - shortName: GMS120
-          # longName: GenbandMS120
-          # siteName: AsSiteRg0
-          # oamAddr:
-            # name: GMS120_OAM
-            # ipv4Address: 255.29.123.216 
-          # mediaAddr:
-            # name: GMS120_MEDIA
-            # ipv4Address: 255.29.123.217 
-          # controlAddr:
-            # name: GMS120_CALL
-            # ipv4Address: 255.29.123.218 
-          # pollingInterval: 60
-          # snmpProfileName: Default
-          # fpm: SM
-          # enableUdpPort: true
-          # enableTcpPort: false
-          # enableTlsPort: false
-          # sipUdpPort: 5160
-          # sipTcpPort: 5161
-          # sipTlsPort: 5162
+        gms:
+        - shortName: GMS120
+          longName: GenbandMS120
+          siteName: AsSiteRg0
+          oamAddr:
+            name: GMS120_OAM
+            ipv4Address: 255.29.123.216 
+          mediaAddr:
+            name: GMS120_MEDIA
+            ipv4Address: 255.29.123.217 
+          controlAddr:
+            name: GMS120_CALL
+            ipv4Address: 255.29.123.218 
+          pollingInterval: 60
+          snmpProfileName: Default
+          fpm: SM
+          enableUdpPort: true
+          enableTcpPort: false
+          enableTlsPort: false
+          sipUdpPort: 5160
+          sipTcpPort: 5161
+          sipTlsPort: 5162
 
         ## Online Charging: OCF Group Data Fill
-        # ocfGroup:
-        # - name:                ocfGr1
-          # stateMachineTimeout: 333
-          # slowResponseTimeout: 100
-          # sendMessageTimeout:  10
-          # diameterWatchdogTimeout: 7
-          # reconnectTimeout:    3
-          # connectTimeout:      1
-          # outboundQueueSize: 1024
-          # vendorType:        "3GPP"
-        # - name:                ocfGr2
-          # stateMachineTimeout: 666
-          # slowResponseTimeout: 500
-          # sendMessageTimeout:  2
-          # diameterWatchdogTimeout: 30
-          # reconnectTimeout:    30
-          # connectTimeout:      15
-          # outboundQueueSize: 2048
-          # vendorType:        "3GPP"        
-        # - name:                ocfGr3
-          # stateMachineTimeout: 998
-          # slowResponseTimeout: 10
-          # sendMessageTimeout:  700
-          # diameterWatchdogTimeout: 800
-          # reconnectTimeout:    900
-          # connectTimeout:      600
-          # outboundQueueSize: 4896
-          # vendorType:        "Version1" 
+        ocfGroup:
+        - name:                ocfGr1
+          stateMachineTimeout: 333
+          slowResponseTimeout: 100
+          sendMessageTimeout:  10
+          diameterWatchdogTimeout: 7
+          reconnectTimeout:    3
+          connectTimeout:      1
+          outboundQueueSize: 1024
+          vendorType:        "3GPP"
+        - name:                ocfGr2
+          stateMachineTimeout: 666
+          slowResponseTimeout: 500
+          sendMessageTimeout:  2
+          diameterWatchdogTimeout: 30
+          reconnectTimeout:    30
+          connectTimeout:      15
+          outboundQueueSize: 2048
+          vendorType:        "3GPP"        
+        - name:                ocfGr3
+          stateMachineTimeout: 998
+          slowResponseTimeout: 10
+          sendMessageTimeout:  700
+          diameterWatchdogTimeout: 800
+          reconnectTimeout:    900
+          connectTimeout:      600
+          outboundQueueSize: 4896
+          vendorType:        "Version1" 
         ## Online Charging: OCF Data Fill
         # ocfData:
         # - shortName:     ocfDat
@@ -1172,17 +1191,17 @@ spec:
           # sesm:          SESM1
           # sesmLong:      SessionManager1 
         ## Offline Charging: CDF Group Data Fill
-        # cdfGroup:
-        # - name:                cdfGrp
-          # stateMachineTimeout: 2
-          # slowResponseTimeout: 998
-          # sendMessageTimeout:  500
-          # diameterWatchdogTimeout: 30
-          # reconnectTimeout:    600
-          # connectTimeout:      150
-          # outboundQueueSize: 2048
+        cdfGroup:
+        - name:                cdfGrp
+          stateMachineTimeout: 2
+          slowResponseTimeout: 998
+          sendMessageTimeout:  500
+          diameterWatchdogTimeout: 30
+          reconnectTimeout:    600
+          connectTimeout:      150
+          outboundQueueSize: 2048
 
-        ## Offline Charging: CDF Data Fill
+        # ## Offline Charging: CDF Data Fill
         # cdfData:
         # - shortName:     cdfDat
           # longName:      cdfDataLong
@@ -1201,7 +1220,7 @@ spec:
       providerType:       kvm
       providerAccessName: kvm_provider_access_ASTL53
       ## image can be specified in: vnfs, rgs, vnfcs. Most specific is used.
-      image:              'MCP-22.0.0.0.4444.qcow2'
+      image:              'MCP-22.0.0.0.4107.qcow2'
       site:
         name:     AsSiteRg0
         easting:  58458
@@ -1217,7 +1236,7 @@ spec:
         hostName:                em1s1
         longName:                EM1Server1
         vnfcType:                'as'
-        flavorName:              EM_4Core_8Ram_200
+        flavorName:              EM_8Core_16Ram_200
         backupProfileName:       sampleBkupConfASTL53     # systemConfig.backupProfiles.*, or empty
        #banner:
        #  ## If no 'banner:' object, default Linux banner used
@@ -1275,6 +1294,27 @@ spec:
          #  subnetName:    MANAGEMENT
          # #logicalName:   asVm1-logical-Rg0-Mtc
          #  ipv4Address:   255.19.106.103
+      - name:                    DB1S1
+        hostName:               db1s1
+        longName:               DB1Server1
+        flavorName: DB_8Core_16Ram_120
+        vnfcType:   as
+        backupProfileName:       sampleBkupConfASTL53     # systemConfig.backupProfiles.*, or empty
+        fpm:        'SM'      
+        scheduleBkupProfileName: scheduleBkupConfASTL53
+        # snmpProfileName: ribbonsec
+        DSCPMarkingProfileName: default                               
+        networkInfo:
+          isDhcp: false
+          hasMtcNetwork: false
+          isPhysicalNetworkSeparation: false
+          networkInterfaces:
+          - networkName: kvm_oam_network_ASTL53
+            subnetName:  OAM
+            # logicalName: DB1S1Addr1
+            ipv4Address: 172.29.70.65
+            macAddress: 00:00:00:00:00:00      
+
       - name:                    SES1S1
        ## name, longName, hostName must be unique
        ## image can be specified in: vnfs, rgs, vnfcs. Most specific is used.
@@ -1344,6 +1384,76 @@ spec:
          #  subnetName:    MANAGEMENT
          # #logicalName:   asVm1-logical-Rg0-Mtc
          #  ipv4Address:   255.19.106.103
+      - name:                    SES2S1
+       ## name, longName, hostName must be unique
+       ## image can be specified in: vnfs, rgs, vnfcs. Most specific is used.
+       #image:
+        hostName:                sesm2s1
+        longName:                SESM2Server1
+        vnfcType:                'as'
+        flavorName:              SESM_6Core_6Ram_40
+        backupProfileName:       sampleBkupConfASTL53     # systemConfig.backupProfiles.*, or empty
+       #banner:
+       #  ## If no 'banner:' object, default Linux banner used
+       #  name: as-banner.txt
+       #  data: xxx                                 # base64 --wrap=0 as-banner.txt, paste data: xxx
+        caaProfileName:          default            # systemConfig.caaRadiusProfiles.* 
+        dscpMarkingProfileName:  default            # systemConfig.dscpMarkingProfiles.*
+       #firewalldConfig:                            # If iptables rules needed for VM
+       #- table:        filter
+       #  chain:        INPUT
+       #  priority:     0
+       #  other_params: -d 255.19.107.64 -p tcp -m tcp --dport 22 -j REJECT --reject-with icmp-port-unreachable
+        fpm:                     SM                 # {sm|fpm}.managers.*.shortName
+        # ipsec:
+          # ipsecProfileName:      sampleIpsecProfile # systemConfig.ipsecProfiles.* 
+          # ipsecConfFile:         externalConfFile   # systemConfig.ipsecConfFiles.*
+          # serverIPs:
+          # - 255.19.107.64
+          # - 255.19.106.64
+          # targetIPs:
+          # - 1.1.1.1
+        scheduleBkupProfileName: scheduleBkupConfASTL53   # systemConfig.scheduleBkupProfiles.*, or empty
+        snmpProfileName:         ribbonsec          # systemConfig.snmpProfiles.*.name
+        networkInfo:
+          isPhysicalNetworkSeparation: false
+         #arpIpAddresses:
+         #- ipv4Address: "1.1.1.1"
+          ## If isPhysicalNetworkSeparation false, 1 networkInterfaces req'd
+          ## If isPhysicalNetworkSeparation true,  2 networkInterfaces req'd
+          networkInterfaces:
+          #- networkName:   kvm_oam_network_ASTL5-3
+          #  subnetName:    OAMP
+          # # logicalName:   asVm1-logical-Rg0-Nic0 
+          #  ipv4Address:   172.29.70.68
+          # # ipv6Address:   "2001:db8::1234"
+          # For SRIOV, pciBuses req'd
+          #  pciBuses:
+          #  - pciBusId: "0000:00:00.0"
+          #    macAddress:  00:00:00:00:00:00
+          #  - pciBusId: "0000:00:00.0"
+          #    macAddress:  00:00:00:00:00:00
+          - networkName:   kvm_private_network_ASTL53
+            subnetName:    SIG
+           #logicalName:   asVm1-logical-Rg0-Nic1
+            ipv4Address:   172.29.71.33
+            macAddress:   00:00:00:00:00:00
+            # pciBuses:
+            # - pciBusId: "0000:81:10.0"
+              # macAddress:  00:00:00:00:00:00
+            # - pciBusId: "0000:83:10.0"
+              # macAddress:  00:00:00:00:00:00
+         #mcpStaticRoute:
+         #- destinationIP: 255.29.111.151
+         #  prefix:        32
+         #  gatewayIP:     255.29.111.1
+         #  interfaceName: eth0
+         #mtcNetworkInterface:
+         #  networkName:   kvm_oam_network
+         #  subnetName:    MANAGEMENT
+         # #logicalName:   asVm1-logical-Rg0-Mtc
+         #  ipv4Address:   255.19.106.103
+
       - name:                    PA1S1
        ## name, longName, hostName must be unique
        ## image can be specified in: vnfs, rgs, vnfcs. Most specific is used.
@@ -1418,7 +1528,7 @@ spec:
       providerType:       kvm
       providerAccessName: kvm_provider_access_ASTL54
       ## image can be specified in: vnfs, rgs, vnfcs. Most specific is used.
-      image:              'MCP-22.0.0.0.4415.qcow2'
+      image:              'MCP-22.0.0.0.4107.qcow2'
       site:
         name:     AsSiteRg0
         easting:  58458
@@ -1434,7 +1544,7 @@ spec:
         hostName:                em1s2
         longName:                EM1Server2
         vnfcType:                'as'
-        flavorName:              EM_4Core_8Ram_200
+        flavorName:              EM_8Core_16Ram_200
         backupProfileName:       sampleBkupConfASTL54     # systemConfig.backupProfiles.*, or empty
        #banner:
        #  ## If no 'banner:' object, default Linux banner used
@@ -1492,6 +1602,28 @@ spec:
          #  subnetName:    MANAGEMENT
          # #logicalName:   asVm1-logical-Rg0-Mtc
          #  ipv4Address:   255.19.106.103
+      - name:                    DB1S2
+        hostName:               db1s2
+        longName:               DB1Server2
+        flavorName: DB_8Core_16Ram_120
+        vnfcType:   as
+        backupProfileName:       sampleBkupConfASTL54     # systemConfig.backupProfiles.*, or empty
+        fpm:        'SM'      
+        scheduleBkupProfileName: scheduleBkupConfASTL54
+        # snmpProfileName: ribbonsec
+        DSCPMarkingProfileName: default                               
+        networkInfo:
+          isDhcp: false
+          hasMtcNetwork: false
+          isPhysicalNetworkSeparation: false
+          networkInterfaces:
+          - networkName: kvm_oam_network_ASTL54
+            subnetName:  OAM
+            # logicalName: DB1S2Addr1
+            ipv4Address: 172.29.70.66
+            macAddress: 00:00:00:00:00:00      
+
+
       - name:                    SES1S2
        ## name, longName, hostName must be unique
        ## image can be specified in: vnfs, rgs, vnfcs. Most specific is used.
@@ -1561,6 +1693,77 @@ spec:
          #  subnetName:    MANAGEMENT
          # #logicalName:   asVm1-logical-Rg0-Mtc
          #  ipv4Address:   255.19.106.103
+      - name:                    SES2S2
+       ## name, longName, hostName must be unique
+       ## image can be specified in: vnfs, rgs, vnfcs. Most specific is used.
+       #image:
+        hostName:                sesm2s2
+        longName:                SESM2Server2
+        vnfcType:                'as'
+        flavorName:              SESM_6Core_6Ram_40
+        backupProfileName:       sampleBkupConfASTL54     # systemConfig.backupProfiles.*, or empty
+       #banner:
+       #  ## If no 'banner:' object, default Linux banner used
+       #  name: as-banner.txt
+       #  data: xxx                                 # base64 --wrap=0 as-banner.txt, paste data: xxx
+        caaProfileName:          default            # systemConfig.caaRadiusProfiles.* 
+        dscpMarkingProfileName:  default            # systemConfig.dscpMarkingProfiles.*
+       #firewalldConfig:                            # If iptables rules needed for VM
+       #- table:        filter
+       #  chain:        INPUT
+       #  priority:     0
+       #  other_params: -d 255.19.107.64 -p tcp -m tcp --dport 22 -j REJECT --reject-with icmp-port-unreachable
+        fpm:                     SM                 # {sm|fpm}.managers.*.shortName
+        # ipsec:
+          # ipsecProfileName:      sampleIpsecProfile # systemConfig.ipsecProfiles.* 
+          # ipsecConfFile:         externalConfFile   # systemConfig.ipsecConfFiles.*
+          # serverIPs:
+          # - 255.19.107.64
+          # - 255.19.106.64
+          # targetIPs:
+          # - 1.1.1.1
+        scheduleBkupProfileName: scheduleBkupConfASTL54   # systemConfig.scheduleBkupProfiles.*, or empty
+        snmpProfileName:         ribbonsec          # systemConfig.snmpProfiles.*.name
+        networkInfo:
+          isPhysicalNetworkSeparation: false
+         #arpIpAddresses:
+         #- ipv4Address: "1.1.1.1"
+          ## If isPhysicalNetworkSeparation false, 1 networkInterfaces req'd
+          ## If isPhysicalNetworkSeparation true,  2 networkInterfaces req'd
+          networkInterfaces:
+          #- networkName:   kvm_oam_network_ASTL5-3
+          #  subnetName:    OAMP
+          # # logicalName:   asVm1-logical-Rg0-Nic0 
+          #  ipv4Address:   172.29.70.68
+          # # ipv6Address:   "2001:db8::1234"
+          # For SRIOV, pciBuses req'd
+          #  pciBuses:
+          #  - pciBusId: "0000:00:00.0"
+          #    macAddress:  00:00:00:00:00:00
+          #  - pciBusId: "0000:00:00.0"
+          #    macAddress:  00:00:00:00:00:00
+          - networkName:   kvm_private_network_ASTL54
+            subnetName:    SIG
+           #logicalName:   asVm1-logical-Rg0-Nic1
+            ipv4Address:   172.29.71.34
+            macAddress:   00:00:00:00:00:00
+            # pciBuses:
+            # - pciBusId: "0000:81:10.0"
+              # macAddress:  00:00:00:00:00:00
+            # - pciBusId: "0000:83:10.0"
+              # macAddress:  00:00:00:00:00:00
+         #mcpStaticRoute:
+         #- destinationIP: 255.29.111.151
+         #  prefix:        32
+         #  gatewayIP:     255.29.111.1
+         #  interfaceName: eth0
+         #mtcNetworkInterface:
+         #  networkName:   kvm_oam_network
+         #  subnetName:    MANAGEMENT
+         # #logicalName:   asVm1-logical-Rg0-Mtc
+         #  ipv4Address:   255.19.106.103
+
+
       - name:                    PA1S2
        ## name, longName, hostName must be unique
        ## image can be specified in: vnfs, rgs, vnfcs. Most specific is used.
