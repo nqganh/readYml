@@ -2,6 +2,9 @@ import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.DumperOptions
 def mcp
 
+Map manifestData = null
+Map pipelineManifestData = null
+
 pipeline {
     agent {
 		label 'yml_node'
@@ -97,7 +100,27 @@ pipeline {
 		}
 		stage('Example Test') {
 			steps {
-				echo 'Hello, JDK'
+				script {
+					Map pipelineManifestMap = readYaml(file: "$WORKSPACE/${params.PIPELINE_MANIFEST}")
+                    pipelineManifestMap.spec.minitafBranchName = "12343"
+                    pipelineManifestMap.spec.vnfrTarball = "12343"
+                    pipelineManifestMap.spec.deploy.image = "12343"
+                    pipelineManifestMap.spec.deploy.pipelineNames = "abc"
+
+                    if (params.MANIFEST.length() > 0) {
+                        for (postDeployOperation in pipelineManifestMap.spec.postDeployOperations) {
+                            if (postDeployOperation.type == 'upgradePrimary') {
+                                postDeployOperation.image = params."12343"
+                                break
+                            }
+                        }
+                    }
+                    // Serialize modified pipeline manifest map into YAML string
+                    String TMP_PIPELINE_MANIFEST_FILE = "tmp/pipeline_manifest.yml"
+                    writeYaml(file: TMP_PIPELINE_MANIFEST_FILE, data: pipelineManifestMap)
+                    String pipelineManifest = readFile(file: TMP_PIPELINE_MANIFEST_FILE)
+                    echo(pipelineManifest)
+				}
 			}
 		}
 		stage('Example Test2') {
