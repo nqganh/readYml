@@ -123,7 +123,7 @@ pipeline {
                     String pipelineManifest = readFile(file: TMP_PIPELINE_MANIFEST_FILE)
                     echo(pipelineManifest)
 					
-					rafPipelineManifest = readYaml(text: pipelineManifest.stripIndent())
+					rafPipelineManifest = readYaml(text: params.PIPELINE_MANIFEST.stripIndent())
 					
 					def spec = rafPipelineManifest.get('spec')
 					echo(spec)
