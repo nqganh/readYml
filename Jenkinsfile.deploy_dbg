@@ -128,7 +128,7 @@ pipeline {
 					
 					pipelineManifestData = readYaml(file: "$WORKSPACE/${params.PIPELINE_MANIFEST}")
 
-					//echo(pipelineManifestData)
+					println(pipelineManifestData.value())
 					def spec = pipelineManifestData.get('spec')
 					//echo(spec)
                     //if (spec == null) {
