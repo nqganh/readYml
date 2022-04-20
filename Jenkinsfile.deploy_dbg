@@ -131,34 +131,11 @@ pipeline {
 					println pipelineManifestData
 					def spec = pipelineManifestData.get('spec')
 					println spec
-                    //if (spec == null) {
-                    //    error("Manifest does not contain required 'spec' property")
-                    //}
-                    //
-                    //def metadata = pipelineManifestData.get('metadata')
-					//
-					//echo(metadata)
-                    //if (metadata == null) {
-                    //    error("Manifest does not contain required 'metadata' property")
-                    //}
 
-                   
-                    //preDeployManifestUpdates = spec.get("preDeployManifestUpdates", [])
                     postDeployOperations = spec.get("postDeployOperations", [])
-					println postDeployOperations
-                    //
-                    //vnfrTarball = spec.get('vnfrTarball', "")
-                    //minitafBranchName = spec.get('minitafBranchName', 'MINI_SANITY_NO_MAS_GMS_Kubernetes')
-                    //
-                    //def deploy = spec.get('deploy')
-                    //if (deploy == null) {
-                    //    error("Manifest does not contain required 'spec.deploy' property")
-                    //}
-                    //
-                    //deployImage = deploy.get('image')
-                    //deployTestPipelines = deploy.get('testPipelines')
 					
-					//echo preDeployManifestUpdates postDeployOperations vnfrTarball minitafBranchName deployImage deployTestPipelines
+					println postDeployOperations
+                    
 				}
 			}
 		}
