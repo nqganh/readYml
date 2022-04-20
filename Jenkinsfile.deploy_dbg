@@ -126,10 +126,10 @@ pipeline {
                     String pipelineManifest = readFile(file: TMP_PIPELINE_MANIFEST_FILE)
                     echo(pipelineManifest)
 					
-					//pipelineManifestData = readYaml(file: "$WORKSPACE/${params.PIPELINE_MANIFEST}")
+					pipelineManifestData = readYaml(file: "$WORKSPACE/${params.PIPELINE_MANIFEST}")
 
 					//echo(pipelineManifestData)
-					//def spec = pipelineManifestData.get('spec')
+					def spec = pipelineManifestData.get('spec')
 					//echo(spec)
                     //if (spec == null) {
                     //    error("Manifest does not contain required 'spec' property")
