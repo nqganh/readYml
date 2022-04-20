@@ -132,17 +132,27 @@ pipeline {
 					def spec = pipelineManifestData.get('spec')
 					println spec
 
-                    postDeployOperations = spec.get("postDeployOperations")
+                    postDeployOperations = spec.get("postDeployOperations", [])
 					
-					println postDeployOperations
+					Map[] postDeployOperations_1 = spec.get("manifest", ["asdfdsaasdfdsaf"])
+					
+					postDeployOperations_1.each {
+						println it
+					}
+					
+
 					
 					def postDeployOperationsExpanded = []
 					for (int i = 0; i < postDeployOperations.size(); i++) {
 						def postDeployOperationDef = postDeployOperations[i]
-	
+						
+						println postDeployOperationDef
+						
 						def blockDef = postDeployOperationDef.get('block')
+											
 						if (blockDef == null) {
 							postDeployOperationsExpanded.add(postDeployOperationDef)
+							echo "khong co block"
 						}
 						else {
 							def loop = postDeployOperationDef.get('loop')
@@ -158,8 +168,9 @@ pipeline {
 						}
 					}
 					
-					
-                    
+					postDeployOperationsExpanded.each {
+						println it
+					}
 				}
 			}
 		}
