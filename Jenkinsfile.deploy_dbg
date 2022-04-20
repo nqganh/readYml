@@ -107,7 +107,8 @@ pipeline {
 		stage('Example Test') {
 			steps {
 				script {
-					Map pipelineManifestMap = readYaml(file: "$WORKSPACE/${params.PIPELINE_MANIFEST}")
+					Map pipelineManifestMap = readYaml(file: "$WORKSPACE/${params.PIPELINE_MANIFEST}")+
+					echo pipelineManifestMap
                     pipelineManifestMap.spec.minitafBranchName = "12343"
                     pipelineManifestMap.spec.vnfrTarball = "12343"
                     pipelineManifestMap.spec.deploy.image = "12343"
@@ -125,8 +126,8 @@ pipeline {
                     String pipelineManifest = readFile(file: TMP_PIPELINE_MANIFEST_FILE)
                     echo(pipelineManifest)
 					
-					pipelineManifestData = readYaml(file: "$WORKSPACE/${params.PIPELINE_MANIFEST}")
-					echo(pipelineManifestData)
+					//pipelineManifestData = readYaml(file: "$WORKSPACE/${params.PIPELINE_MANIFEST}")
+					//echo(pipelineManifestData)
 					//def spec = pipelineManifestData.get('spec')
 					//echo(spec)
                     //if (spec == null) {
