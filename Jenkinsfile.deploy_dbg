@@ -160,25 +160,5 @@ pipeline {
 				}
 			}
 		}
-		stage('Example Test2') {
-            failFast true
-            parallel {
-            stage('Branch A') {
-                steps {
-                    echo "On Branch A"
-                }
-            }
-             stage('Branch B') {
-                    steps {
-                        echo "On Branch B"
-                    }
-                }
-			}
-			post {
-				always {
-					echo "abc"
-				}
-			}
-		}
 	}   
 }
