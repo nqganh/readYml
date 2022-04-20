@@ -134,6 +134,7 @@ pipeline {
 
                     postDeployOperations = spec.get("postDeployOperations", [])
 					
+					def postDeployOperationsExpanded = []
 					for (int i = 0; i < postDeployOperations.size(); i++) {
 						def postDeployOperationDef = postDeployOperations[i]
 	
