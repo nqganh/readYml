@@ -117,46 +117,6 @@ pipeline {
                             break
                         }
                     }
-                    // Serialize modified pipeline manifest map into YAML string
-                    String TMP_PIPELINE_MANIFEST_FILE = "tmp/pipeline_manifest.yml"
-                    writeYaml(file: TMP_PIPELINE_MANIFEST_FILE, data: pipelineManifestMap)
-                    String pipelineManifest = readFile(file: TMP_PIPELINE_MANIFEST_FILE)
-                    echo(pipelineManifest)
-					
-					
-					def spec = pipelineManifestMap.get('spec')
-					echo(spec)
-                    if (spec == null) {
-                        error("Manifest does not contain required 'spec' property")
-                    }
-
-                    def metadata = pipelineManifestMap.get('metadata')
-					
-					echo(metadata)
-                    if (metadata == null) {
-                        error("Manifest does not contain required 'metadata' property")
-                    }
-                    
-                    // Load the AS VNF manifest from filename or text
-                    // if a value if provided for both Job params MANIFEST_FILENAME and MANIFEST 
-                    // MANIFEST_FILENAME will override MANIFEST
-                   
-
-                    preDeployManifestUpdates = spec.get("preDeployManifestUpdates", [])
-                    postDeployOperations = spec.get("postDeployOperations", [])
-                    
-                    vnfrTarball = spec.get('vnfrTarball', "")
-                    minitafBranchName = spec.get('minitafBranchName', 'MINI_SANITY_NO_MAS_GMS_Kubernetes')
-
-                    def deploy = spec.get('deploy')
-                    if (deploy == null) {
-                        error("Manifest does not contain required 'spec.deploy' property")
-                    }
-
-                    deployImage = deploy.get('image')
-                    deployTestPipelines = deploy.get('testPipelines')
-					
-					echo preDeployManifestUpdates postDeployOperations vnfrTarball minitafBranchName deployImage deployTestPipelines
 				}
 			}
 		}
