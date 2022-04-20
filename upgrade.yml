@@ -1,0 +1,34 @@
+---
+kind: RafPipeline
+metadata:
+  name: Deploy/Upgrade
+  description: |
+   AS Deployment - Upgrades a AS Vnf RAF object
+
+   Any valid manifest of kind GenericAsVnf can be used along with this RafPipeline manifest.
+
+   The following manifests can be used with this pipeline manifest:
+   build/manifests/generic-as_vnf/7_vm_em_db_colocated.yml
+   build/manifests/generic-as_vnf/7_vm_em_db_separated.yml
+   build/manifests/generic-as_vnf/sanity_check_manifest.yml
+   ... (not exclusive other manifests can be used)
+spec:
+  deploy: 
+    image: MCP-22.0.0.0.3544
+    testPipelines: 
+    - "Smoke_Test"
+  
+  preDeployManifestUpdates: []        # no modifications to manifest prior to deployment
+  
+  postDeployOperations: 
+  - id: upgradePrimaryVms             # used in log archive name
+    type: upgradePrimary              # operation to perform
+    title: Upgrade primary side VMs
+    image: MCP-22.0.0.0.3868
+    
+  - id: upgradeSecondaryVms           # used in log archive name
+    type: upgradeSecondary            # operation to perform
+    title: Upgrade secondary side VMs # title used as short description and is printed in the job console
+    image: ""                         # name of image to use for upgrade, primary upgrade must be performed first as the image is only downloaded once 
+  
+  # Rollbacks can be added once they are supported
