@@ -130,7 +130,7 @@ pipeline {
 
 					println pipelineManifestData
 					def spec = pipelineManifestData.get('spec')
-					//echo(spec)
+					println spec
                     //if (spec == null) {
                     //    error("Manifest does not contain required 'spec' property")
                     //}
@@ -145,7 +145,7 @@ pipeline {
                    
                     //preDeployManifestUpdates = spec.get("preDeployManifestUpdates", [])
                     postDeployOperations = spec.get("postDeployOperations", [])
-					println(postDeployOperations)
+					println postDeployOperations
                     //
                     //vnfrTarball = spec.get('vnfrTarball', "")
                     //minitafBranchName = spec.get('minitafBranchName', 'MINI_SANITY_NO_MAS_GMS_Kubernetes')
