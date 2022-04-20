@@ -107,8 +107,8 @@ pipeline {
 		stage('Example Test') {
 			steps {
 				script {
-					Map pipelineManifestMap = readYaml(file: "$WORKSPACE/${params.PIPELINE_MANIFEST}")+
-					echo pipelineManifestMap
+					Map pipelineManifestMap = readYaml(file: "$WORKSPACE/${params.PIPELINE_MANIFEST}")
+					echo(pipelineManifestMap)
                     pipelineManifestMap.spec.minitafBranchName = "12343"
                     pipelineManifestMap.spec.vnfrTarball = "12343"
                     pipelineManifestMap.spec.deploy.image = "12343"
