@@ -132,7 +132,7 @@ pipeline {
 					def spec = pipelineManifestData.get('spec')
 					println spec
 
-                    postDeployOperations = spec.get("postDeployOperations", [])
+                    postDeployOperations = spec.get("postDeployOperations")
 					
 					println postDeployOperations
                     
