@@ -125,7 +125,7 @@ pipeline {
                     String pipelineManifest = readFile(file: TMP_PIPELINE_MANIFEST_FILE)
                     echo(pipelineManifest)
 					
-					pipelineManifestData = readYaml(text: params.PIPELINE_MANIFEST.stripIndent())
+					pipelineManifestData = readYaml(file: "$WORKSPACE/${TMP_PIPELINE_MANIFEST_FILE}")
 					
 					def spec = rafPipelineManifest.get('spec')
 					echo(spec)
