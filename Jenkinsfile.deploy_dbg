@@ -127,13 +127,13 @@ pipeline {
 					
 					pipelineManifestData = readYaml(file: "$WORKSPACE/${TMP_PIPELINE_MANIFEST_FILE}")
 					
-					def spec = rafPipelineManifest.get('spec')
+					def spec = pipelineManifestData.get('spec')
 					echo(spec)
                     if (spec == null) {
                         error("Manifest does not contain required 'spec' property")
                     }
 
-                    def metadata = rafPipelineManifest.get('metadata')
+                    def metadata = pipelineManifestData.get('metadata')
 					
 					echo(metadata)
                     if (metadata == null) {
