@@ -124,13 +124,13 @@ pipeline {
                     echo(pipelineManifest)
 					
 					
-					def spec = pipelineManifestMap.get('spec')
+					def spec = pipelineManifest.get('spec')
 					echo(spec)
                     if (spec == null) {
                         error("Manifest does not contain required 'spec' property")
                     }
 
-                    def metadata = pipelineManifestMap.get('metadata')
+                    def metadata = pipelineManifest.get('metadata')
 					
 					echo(metadata)
                     if (metadata == null) {
