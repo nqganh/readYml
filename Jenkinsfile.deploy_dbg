@@ -127,6 +127,7 @@ pipeline {
                     echo(pipelineManifest)
 					
 					//pipelineManifestData = readYaml(file: "$WORKSPACE/${params.PIPELINE_MANIFEST}")
+
 					//echo(pipelineManifestData)
 					//def spec = pipelineManifestData.get('spec')
 					//echo(spec)
@@ -140,11 +141,11 @@ pipeline {
                     //if (metadata == null) {
                     //    error("Manifest does not contain required 'metadata' property")
                     //}
-                    
-                   
 
+                   
                     //preDeployManifestUpdates = spec.get("preDeployManifestUpdates", [])
-                    //postDeployOperations = spec.get("postDeployOperations", [])
+                    postDeployOperations = spec.get("postDeployOperations", [])
+					println(postDeployOperations)
                     //
                     //vnfrTarball = spec.get('vnfrTarball', "")
                     //minitafBranchName = spec.get('minitafBranchName', 'MINI_SANITY_NO_MAS_GMS_Kubernetes')
