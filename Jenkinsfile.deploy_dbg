@@ -107,12 +107,10 @@ pipeline {
                     pipelineManifestMap.spec.deploy.image = "12343"
                     pipelineManifestMap.spec.deploy.pipelineNames = "abc"
 
-                    if (params.MANIFEST.length() > 0) {
-                        for (postDeployOperation in pipelineManifestMap.spec.postDeployOperations) {
-                            if (postDeployOperation.type == 'upgradePrimary') {
-                                postDeployOperation.image = params."12343"
-                                break
-                            }
+                    for (postDeployOperation in pipelineManifestMap.spec.postDeployOperations) {
+                        if (postDeployOperation.type == 'upgradePrimary') {
+                            postDeployOperation.image = "12343"
+                            break
                         }
                     }
                     // Serialize modified pipeline manifest map into YAML string
