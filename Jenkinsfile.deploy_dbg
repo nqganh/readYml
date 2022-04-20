@@ -132,7 +132,28 @@ pipeline {
 					def spec = pipelineManifestData.get('spec')
 					println spec
 
-                    postDeployOperations = spec.get("postDeployOperations")
+                    postDeployOperations = spec.get("postDeployOperations", [])
+					
+					for (int i = 0; i < postDeployOperations.size(); i++) {
+						def postDeployOperationDef = postDeployOperations[i]
+	
+						def blockDef = postDeployOperationDef.get('block')
+						if (blockDef == null) {
+							postDeployOperationsExpanded.add(postDeployOperationDef)
+						}
+						else {
+							def loop = postDeployOperationDef.get('loop')
+							for (int blockLoopCount = 0; blockLoopCount < loop; blockLoopCount++) {
+								for (operation in blockDef) {
+									def operationLoopIteration = new JsonSlurper().parseText(JsonOutput.toJson(operation))
+									// Generate new operation title, add operation count and loop iteration
+									operationLoopIteration.title = "(${blockLoopCount}) ${operation.title}"
+									operationLoopIteration.id = "${operation.id}-${i}-#${blockLoopCount}"
+									postDeployOperationsExpanded.add(operationLoopIteration)
+								}
+							}
+						}
+					}
 					
 					println postDeployOperations
                     
