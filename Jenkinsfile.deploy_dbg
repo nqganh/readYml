@@ -134,7 +134,7 @@ pipeline {
 
                     postDeployOperations = spec.get("postDeployOperations", [])
 					
-					Map[] postDeployOperations_1 = spec.get("manifest", ["asdfdsaasdfdsaf"])
+					Map[] postDeployOperations_1 = spec.get("manifest", "asdfdsaasdfdsaf")
 					
 					postDeployOperations_1.each {
 						println it
