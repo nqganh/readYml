@@ -134,13 +134,11 @@ pipeline {
 
                     postDeployOperations = spec.get("postDeployOperations", [])
 					
-					Map[] postDeployOperations_1 = spec.get("manifest", "asdfdsaasdfdsaf")
+					applyAllObjectManifests_opt ('print postDeployOperations', postDeployOperations)
 					
-					postDeployOperations_1.each {
-						println it
-					}
-					
-
+					def postDeployOperations_1 = spec.get("manifest", "asdfdsaasdfdsaf")
+					println postDeployOperations_1
+								
 					
 					def postDeployOperationsExpanded = []
 					for (int i = 0; i < postDeployOperations.size(); i++) {
@@ -175,4 +173,10 @@ pipeline {
 			}
 		}
 	}   
+}
+public void applyAllObjectManifests_opt(String label, def postDeployOperationss) { 
+	println label
+    this.postDeployOperationss.each {
+        println it
+    }
 }
